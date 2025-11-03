@@ -356,6 +356,47 @@ function adjustVoicingsToTargetOctave(voicings, baseOctave) {
     });
 }
 
+/**
+ * Resolves semitone clashes in a voicing by shifting notes by an octave.
+ * It chooses the shift (lower note down or upper note up) that results in a
+ * smaller voice-leading distance from the previous chord.
+ * @param {number[]} voicing - The chord voicing to resolve.
+ * @param {number[]} previousChordNotes - The notes of the previous chord, for distance calculation.
+ * @returns {number[]} A new voicing with semitone clashes resolved.
+ */
+function resolveSemitoneClashes (voicing, previousChordNotes) {
+  if (voicing.length < 2 || !previousChordNotes || previousChordNotes.length === 0) {
+    return voicing
+  }
+
+  let resolvedVoicing = [...voicing].sort((a, b) => a - b)
+
+  while (true) {
+    let clashFound = false
+    // Iterate backwards to safely modify the array
+    for (let i = resolvedVoicing.length - 2; i >= 0; i--) {
+      if (resolvedVoicing[i + 1] - resolvedVoicing[i] === 1) { // Semitone clash found
+        // Option A: Move the higher note up an octave
+        const optionA = [...resolvedVoicing]
+        optionA[i + 1] += 12
+
+        // Option B: Move the lower note down an octave
+        const optionB = [...resolvedVoicing]
+        optionB[i] -= 12
+
+        // Choose the resolution that is "smoother" relative to the previous chord
+        const distA = calculateVoicingDistance(previousChordNotes, optionA)
+        const distB = calculateVoicingDistance(previousChordNotes, optionB)
+
+        resolvedVoicing = distA <= distB ? optionA : optionB
+        clashFound = true
+        break // Restart the check from the beginning with the new voicing
+      }
+    }
+    if (!clashFound) break // No more clashes found in a full pass
+  }
+  return resolvedVoicing.sort((a, b) => a - b)
+}
 
 /**
  * Main function to apply inversion/voicing algorithms.
@@ -390,11 +431,14 @@ function applyInversion(chordNotes, inversionType, previousChordNotes, baseOctav
                     const octaveDifference = Math.round((targetAverage - invAverage) / 12);
                     const adjustedInversion = inversion.map(note => note + octaveDifference * 12);
 
-                    // Calculate distance and find the best voicing (which is already in the correct octave).
-                    const distance = calculateVoicingDistance(targetVoicing, adjustedInversion);
+                    // Resolve semitone clashes before calculating the final distance.
+                    // This ensures we only choose from musically valid voicings.
+                    const finalCandidate = resolveSemitoneClashes(adjustedInversion, targetVoicing);
+
+                    const distance = calculateVoicingDistance(targetVoicing, finalCandidate);
                     if (distance < minDistance) {
                         minDistance = distance;
-                        bestVoicing = adjustedInversion;
+                        bestVoicing = finalCandidate;
                     }
                 }
                 newVoicing = bestVoicing;
