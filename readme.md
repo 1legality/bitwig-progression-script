@@ -5,9 +5,13 @@ A Bitwig Studio controller script that parses a text-based chord progression and
 ## Features
 
 *   Parses chord progressions in a simple text format (e.g., `C:1 Am:1 F:1 G:1`).
-*   Supports various chord qualities.
+*   Supports various chord qualities, including single notes for melodies.
+*   Customizable chord duration (e.g., `C:0.5` for a half bar).
+*   Support for slash chords to specify bass notes (e.g., `C/G`).
+*   Ability to add rests to your progression (e.g., `R:1`).
 *   Different output types: Chords + Bass, Chords only, Bass only, Bass + Fifth.
-*   Chord inversions and smooth voice leading.
+*   Multiple chord inversion and voicing options, including smooth voice leading.
+*   Web editor to fine-tune your progression, generate a midi file or a pdf or share your progression easily.
 
 ## Installation
 
@@ -22,11 +26,60 @@ A Bitwig Studio controller script that parses a text-based chord progression and
 ## How to Use
 
 1.  Once the controller is added, you will see a new panel in Bitwig.
-2.  Enter your chord progression in the "Progression" text box.
+2.  Enter your chord progression in the "Progression" text box using the format described below.
 3.  To make it easier to generate chord progressions, you can use one of the following AI assistants:
     *   **ChatGPT:** [https://chatgpt.com/g/g-682e7b9f338881919be4abdc2900b752-chord-progression-generator](https://chatgpt.com/g/g-682e7b9f338881919be4abdc2900b752-chord-progression-generator)
     *   **Gemini:** [https://gemini.google.com/gem/1mEp9hCTbbA9UybeB3l8-ZQEkzQKC1TXh?usp=sharing](https://gemini.google.com/gem/1mEp9hCTbbA9UybeB3l8-ZQEkzQKC1TXh?usp=sharing)
-4.  Click the "Generate!" button to create the MIDI clip.
+4.  Choose your desired `Output Type`, `Inversion`, and `Base Octave`.
+5.  Click the "Generate!" button to create the MIDI clip.
+
+## Progression Format
+
+The script parses a simple text format where each part of the progression is separated by a space.
+
+### Basic Syntax
+
+Each part of the progression consists of a `chord` and a `duration`, separated by a colon.
+
+`[Chord]:[Duration]`
+
+*   **Example:** `C:1 Am:1 F:1 G:1`
+
+If no duration is specified, it defaults to `1` bar.
+
+### Chord Duration
+
+The duration is specified in bars. You can use decimals for shorter durations.
+
+*   `C:2` - A C major chord for 2 bars.
+*   `Am:0.5` - An A minor chord for half a bar (2 beats).
+*   `F:0.25` - An F major chord for a quarter of a bar (1 beat).
+
+### Slash Chords
+
+You can specify a different bass note for a chord using the slash (`/`) notation.
+
+`[Chord]/[Bass Note]:[Duration]`
+
+*   **Example:** `C/G:1` will play a C major chord with a G in the bass.
+
+### Rests
+
+To add a rest, use `R` as the chord.
+
+`R:[Duration]`
+
+*   **Example:** `C:1 R:1 G:1` will play a C major chord for one bar, followed by one bar of silence, and then a G major chord.
+
+## Examples
+
+Here are a few examples combining these features:
+
+*   **A simple pop progression:**
+    `C:1 G:1 Am:1 F:1`
+
+*   **A progression with slash chords and varied duration:**
+    `Dm7:1 G7:1 Cmaj7/G:2`
 
 ## Chord Qualities
 

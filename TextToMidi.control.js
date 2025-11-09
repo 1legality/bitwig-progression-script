@@ -124,23 +124,185 @@ function init () {
   const cursorClipArranger = host.createArrangerCursorClip(16 * 128, 128)
   cursorClipLauncher.scrollToKey(0)
   cursorClipArranger.scrollToKey(0)
+  
+  const progressionText = documentState.getStringSetting('Progression', 'Text To Midi', 512, 'C:1 Am:1 F:1 G:1')
+  const clipType = documentState.getEnumSetting('Clip Type', 'Text To Midi', ['Launcher', 'Arranger'], 'Launcher')
+  const baseOctave = documentState.getNumberSetting('Base Octave', 'Text To Midi', 0, 8, 1, '', 4)
+  const outputType = documentState.getEnumSetting('Output Type', 'Text To Midi', ['Chords + Bass', 'Chords only', 'Bass only', 'Bass + Fifth'], 'Chords + Bass')
+  const inversionType = documentState.getEnumSetting('Inversion', 'Text To Midi', ['None', '1st Inversion', 'Smooth Voice Leading', 'Pianist', 'Open Voicing', 'Spread'], 'None')
 
-  const progressionText = documentState.getStringSetting('Progression', 'Chord Progression', 512, 'C:1 Am:1 F:1 G:1')
-  const clipType = documentState.getEnumSetting('Clip Type', 'Clip', ['Launcher', 'Arranger'], 'Launcher')
-  const baseOctave = documentState.getNumberSetting('Base Octave', 'MIDI', 0, 8, 1, '', 4)
-  const outputType = documentState.getEnumSetting('Output Type', 'MIDI', ['Chords + Bass', 'Chords only', 'Bass only', 'Bass + Fifth'], 'Chords + Bass')
-  const inversionType = documentState.getEnumSetting('Inversion', 'MIDI', ['None', '1st Inversion', 'Smooth Voice Leading', 'Pianist', 'Open Voicing', 'Spread'], 'None')
-
-  function getCursorClip () {
-    return clipType.get() === 'Arranger' ? cursorClipArranger : cursorClipLauncher
-  }
-
-  documentState.getSignalSetting('Generate', 'Chord Progression', 'Generate!').addSignalObserver(() => {
+  documentState.getSignalSetting('Generate', 'Text To Midi', 'Generate!').addSignalObserver(() => {
     const progression = progressionText.get()
     const cursorClip = getCursorClip()
     cursorClip.clearSteps()
     parseAndGenerate(progression, cursorClip)
   })
+  
+  documentState.getSignalSetting('Open Web Editor', 'Text To Midi', 'Open Web Editor!').addSignalObserver(() => {
+    // Map by displayed label (matches how settings were defined)
+    const outputMap = {
+      'Chords + Bass': 'chordsAndBass',
+      'Chords only': 'chordsOnly',
+      'Bass only': 'bassOnly',
+      'Bass + Fifth': 'bassAndFifth'
+    }
+    const inversionMap = {
+      'None': 'none',
+      '1st Inversion': 'first',
+      'Smooth Voice Leading': 'smooth',
+      'Pianist': 'pianist',
+      'Open Voicing': 'open',
+      'Spread': 'spread'
+    }
+
+    const selectedOutputLabel = outputType.get()
+    const selectedInversionLabel = inversionType.get()
+
+    const progressionParam = encodeURIComponent(progressionText.get())
+    const outputParam = outputMap[selectedOutputLabel] || 'chordsAndBass'
+    const inversionParam = inversionMap[selectedInversionLabel] || 'none'
+    const baseOctaveParam = String(baseOctave.getRaw())
+
+    const baseUrl = 'https://1legality.github.io/progression-to-midi'
+    const url = `${baseUrl}?progression=${progressionParam}` +
+      `&outputType=${outputParam}` +
+      `&inversionType=${inversionParam}` +
+      `&baseOctave=${baseOctaveParam}`
+
+    println(`[Open Editor] output='${selectedOutputLabel}' -> ${outputParam}, inversion='${selectedInversionLabel}' -> ${inversionParam}`)
+    println(`[Open Editor] ${url}`)
+    host.showPopupNotification(`Opening Web Editor: ${outputParam}, ${inversionParam}, ${url}`)
+    openUrlInBrowser(url)
+  })
+
+  // Helper: Try to open a URL in the system browser, with safe fallbacks
+  function openUrlInBrowser (url) {
+    try {
+      // Prefer host-provided helpers if available
+      if (typeof host.openUrlInBrowser === 'function') {
+        host.openUrlInBrowser(url)
+        return
+      }
+      if (typeof host.openURI === 'function') {
+        host.openURI(url)
+        return
+      }
+      if (typeof host.openUrl === 'function') {
+        host.openUrl(url)
+        return
+      }
+    } catch (e) {
+      // fall through to other strategies
+    }
+
+    // Try Java Desktop via Rhino `Packages` (older Bitwig)
+    try {
+      var Desktop = Packages && Packages.java && Packages.java.awt && Packages.java.awt.Desktop
+      var URI = Packages && Packages.java && Packages.java.net && Packages.java.net.URI
+      if (Desktop && URI && Desktop.isDesktopSupported()) {
+        Desktop.getDesktop().browse(new URI(url))
+        return
+      }
+    } catch (e2) {
+      // ignore and fall back to popup
+    }
+
+    // Try Java Desktop via Nashorn `Java.type` (newer Bitwig)
+    try {
+      if (typeof Java !== 'undefined' && typeof Java.type === 'function') {
+        var Desktop2 = Java.type('java.awt.Desktop')
+        var URI2 = Java.type('java.net.URI')
+        if (Desktop2.isDesktopSupported()) {
+          Desktop2.getDesktop().browse(new URI2(url))
+          return
+        }
+      }
+    } catch (e3) {
+      // ignore and continue
+    }
+
+    // OS-specific launcher via ProcessBuilder
+    try {
+      var isWin = (typeof host.platformIsWindows === 'function' && host.platformIsWindows()) || Packages.java.lang.System.getProperty('os.name').toLowerCase().indexOf('win') >= 0
+      var isMac = (typeof host.platformIsMac === 'function' && host.platformIsMac()) || Packages.java.lang.System.getProperty('os.name').toLowerCase().indexOf('mac') >= 0
+      var isLinux = !isWin && !isMac
+
+      var pb
+      if (typeof Java !== 'undefined' && typeof Java.type === 'function') {
+        var ProcessBuilder = Java.type('java.lang.ProcessBuilder')
+        if (isWin) {
+          // Quote URL so cmd.exe doesn't treat & as a separator
+          pb = new ProcessBuilder('cmd', '/c', 'start', '', '"' + url + '"')
+        } else if (isMac) {
+          pb = new ProcessBuilder('open', url)
+        } else if (isLinux) {
+          pb = new ProcessBuilder('xdg-open', url)
+        }
+        if (pb) {
+          pb.start()
+          return
+        }
+      } else if (typeof Packages !== 'undefined' && Packages.java && Packages.java.lang) {
+        var PB = Packages.java.lang.ProcessBuilder
+        if (isWin) {
+          // Quote URL to prevent cmd parsing of & and spaces
+          pb = new PB(Packages.java.util.Arrays.asList(['cmd', '/c', 'start', '', '"' + url + '"']))
+        } else if (isMac) {
+          pb = new PB(Packages.java.util.Arrays.asList(['open', url]))
+        } else if (isLinux) {
+          pb = new PB(Packages.java.util.Arrays.asList(['xdg-open', url]))
+        }
+        if (pb) {
+          pb.start()
+          return
+        }
+      }
+    } catch (e4) {
+      // ignore
+    }
+
+    // As a last helpful fallback: copy to clipboard if possible
+    try {
+      var copied = false
+      // Rhino path
+      try {
+        var Toolkit = Packages && Packages.java && Packages.java.awt && Packages.java.awt.Toolkit
+        var StringSelection = Packages && Packages.java && Packages.java.awt && Packages.java.awt.datatransfer && Packages.java.awt.datatransfer.StringSelection
+        if (Toolkit && StringSelection) {
+          var clip = Toolkit.getDefaultToolkit().getSystemClipboard()
+          clip.setContents(new StringSelection(url), null)
+          copied = true
+        }
+      } catch (ignore) {}
+
+      // Nashorn path
+      if (!copied && typeof Java !== 'undefined' && typeof Java.type === 'function') {
+        var Toolkit2 = Java.type('java.awt.Toolkit')
+        var StringSelection2 = Java.type('java.awt.datatransfer.StringSelection')
+        var clip2 = Toolkit2.getDefaultToolkit().getSystemClipboard()
+        clip2.setContents(new StringSelection2(url), null)
+        copied = true
+      }
+
+      if (copied) {
+        host.showPopupNotification('Link copied to clipboard. Paste in browser.')
+        println('URL copied to clipboard: ' + url)
+        return
+      }
+    } catch (e5) {
+      // ignore
+    }
+
+    // Fallback: show the URL so the user can click/copy
+    host.showPopupNotification('Open in browser: ' + url)
+    println('Open this URL in a browser: ' + url)
+  }
+
+  // getCursorClip helper used by buttons below
+  
+  function getCursorClip () {
+    return clipType.get() === 'Arranger' ? cursorClipArranger : cursorClipLauncher
+  }
 
   function parseAndGenerate (progressionString, cursorClip) {
     const baseMidiNote = (baseOctave.getRaw() + 1) * 12
