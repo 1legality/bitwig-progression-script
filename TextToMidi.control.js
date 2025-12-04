@@ -163,7 +163,7 @@ function init () {
     const inversionParam = inversionMap[selectedInversionLabel] || 'none'
     const baseOctaveParam = String(baseOctave.getRaw())
 
-    const baseUrl = 'https://1legality.github.io/progression-to-midi'
+    const baseUrl = 'https://lab.malandry.com/tools/chord-progression-tool'
     const url = `${baseUrl}?progression=${progressionParam}` +
       `&outputType=${outputParam}` +
       `&inversionType=${inversionParam}` +
