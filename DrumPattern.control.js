@@ -32,10 +32,2060 @@ const GM_DRUM_MAP = {
   "LC": 64
 }
 
-const DRUM_SECTIONS = ["Afro-Cuban","Basic Patterns","Breaks","Breaks - Kick","Breaks - Snare","Drum Rolls","Drum and Bass","Dub","EDM","Electro","Funk and Soul","Ghost Snares","Hip Hop","House","Hybrid Breaks With Alternate Endings","Irregular Breaks","Miami Bass","Pop","Reggaeton","Rock","Rolling Breaks","Standard Breaks","Uncategorized"];
-const DRUM_PATTERNS = [{"s":22,"n":"EXAMPLE PATTERN","i":{"BD":[1,9],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":1,"n":"ONE AND SEVEN & FIVE AND THIRTEEN","i":{"BD":[1,7],"SN":[5,13]}},{"s":1,"n":"BOOTS N\u2019 CATS","i":{"BD":[1,9],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":1,"n":"TINY HOUSE","i":{"OH":[3,7,11,15],"BD":[1,5,9,13]}},{"s":1,"n":"GOOD TO GO","i":{"BD":[1,4,7,11],"SN":[5,13]}},{"s":1,"n":"HIP HOP","i":{"BD":[1,3,7,8,15],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":21,"n":"STANDARD BREAK 1","i":{"BD":[1,11],"SN":[5,13],"CH":[1,3,5,7,9,10,11,13,15]}},{"s":21,"n":"STANDARD BREAK 2","i":{"BD":[1,11],"SN":[5,13],"CH":[1,3,5,7,8,9,11,15]}},{"s":21,"n":"ROLLING BREAK","i":{"BD":[1,8,11],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":21,"n":"THE UNKNOWN DRUMMER","i":{"BD":[1,4,7,11],"SN":[2,5,8,13],"CH":[2,3,5,6,8,14],"OH":[9,15]}},{"s":19,"n":"ROCK 1","i":{"BD":[1,8,9,11],"SN":[5,13],"CY":[1],"CH":[1,3,5,7,9,11,13,15]}},{"s":19,"n":"ROCK 2","i":{"BD":[1,8,9,11],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":19,"n":"ROCK 3","i":{"BD":[1,8,9,11],"SN":[5,13],"OH":[15],"CH":[1,3,5,7,9,11,13,15]}},{"s":19,"n":"ROCK 4","i":{"BD":[1,8,9,11],"SN":[5,13,15,16],"OH":[15],"CH":[1,3,5,7,9,11,13,15]}},{"s":9,"n":"ELECTRO 1 - A","i":{"SN":[5,13],"BD":[1,7]}},{"s":9,"n":"ELECTRO 1 - B","i":{"SN":[5,13],"BD":[1,7,11,15]}},{"s":9,"n":"ELECTRO 2 - A","i":{"SN":[5,13],"BD":[1,7]}},{"s":9,"n":"ELECTRO 2 - B","i":{"SN":[5,13],"BD":[1,11,14]}},{"s":9,"n":"ELECTRO 3 - A","i":{"SN":[5,13],"BD":[1,7,12]}},{"s":9,"n":"ELECTRO 3 - B","i":{"SN":[5,13],"BD":[1,7,12,14]}},{"s":9,"n":"ELECTRO 4","i":{"SN":[5,13],"BD":[1,7,11,14]}},{"s":9,"n":"SIBERIAN NIGHTS","i":{"CH":[1,3,4,5,7,8,9,11,12,13,15,16],"SN":[5,13],"BD":[1,7]}},{"s":9,"n":"NEW WAVE","i":{"BD":[1,7,9,10],"SN":[5,13],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[3],"SH":[5,13]}},{"s":13,"n":"HOUSE","i":{"BD":[1,5,9,13],"SN":[5,13],"CY":[1],"OH":[3,7,11,15]}},{"s":13,"n":"HOUSE 2","i":{"BD":[1,5,9,13],"SN":[5,13],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[3,6,11,14]}},{"s":13,"n":"BRIT HOUSE","i":{"BD":[1,5,9,13],"CL":[5,13],"CY":[3,7,11,15],"CH":[1,2,4,5,6,8,9,10,12,13,14,16],"OH":[3,7,11,15]}},{"s":13,"n":"FRENCH HOUSE","i":{"BD":[1,5,9,13],"CL":[5,13],"SH":[1,2,3,5,7,8,9,10,11,13,15,16],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[2,4,6,8,10,12,14,16]}},{"s":13,"n":"DIRTY HOUSE","i":{"BD":[1,3,5,9,11,13,16],"SN":[5,13],"CL":[3,5,9,11,13],"CH":[11,16],"OH":[3,11,15]}},{"s":13,"n":"DEEP HOUSE","i":{"BD":[1,5,9,13],"CL":[5,13],"CH":[2,8,10],"OH":[3,7,11,15]}},{"s":13,"n":"DEEPER HOUSE","i":{"BD":[1,5,9,13],"CL":[2,10],"MT":[3,8,11],"SH":[4,9],"OH":[3,7,11,12,15]}},{"s":13,"n":"SLOW DEEP HOUSE","i":{"BD":[1,5,9,13],"CL":[5,13],"SH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"CH":[1,5,9,13],"OH":[3,4,7,8,10,11,13]}},{"s":13,"n":"FOOTWORK - A","i":{"BD":[1,4,7,9,12,15],"CL":[13],"CH":[3,11],"RS":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}},{"s":13,"n":"FOOTWORK - B","i":{"BD":[1,4,7,9,12,15],"CL":[13],"CH":[3,7,8,11,15],"RS":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}},{"s":16,"n":"MIAMI BASS - A","i":{"BD":[1,7],"SN":[5,13],"CH":[1,3,4,5,7,8,9,11,12,13,15,16]}},{"s":16,"n":"MIAMI BASS - B","i":{"BD":[1,7,11,14],"SN":[5,13],"CH":[1,3,4,5,7,8,9,11,12,13,15,16]}},{"s":16,"n":"SALLY","i":{"BD":[1,7,11,15],"SN":[5,13],"LT":[1,7,11,15],"CH":[1,3,5,7,9,11,13,15]}},{"s":16,"n":"ROCK THE PLANET","i":{"BD":[1,4,7],"SN":[5,13],"CH":[1,3,4,5,7,8,9,11,12,13,14,15,16]}},{"s":12,"n":"HIP HOP 1 - A","i":{"BD":[1,7,8,12,15],"SN":[5,13]}},{"s":12,"n":"HIP HOP 1 - B","i":{"BD":[1,8,12],"SN":[5,13]}},{"s":12,"n":"HIP HOP 2 - A","i":{"BD":[1,8,9,10,14,16],"SN":[5,13]}},{"s":12,"n":"HIP HOP 2 - B","i":{"BD":[1,8,9,12],"SN":[5,10,13]}},{"s":12,"n":"HIP HOP 3 - A","i":{"BD":[1,3,9,11],"SN":[5,13]}},{"s":12,"n":"HIP HOP 3 - B","i":{"BD":[1,3,9,10,12],"SN":[5,13]}},{"s":12,"n":"HIP HOP 4 - A","i":{"BD":[1,4,8,10,11,16],"SN":[5,13]}},{"s":12,"n":"HIP HOP 4 - B","i":{"BD":[1,3,8,9,10,11],"SN":[5,13]}},{"s":12,"n":"HIP HOP 5","i":{"BD":[1,3,8,9,11,16],"SN":[5,13]}},{"s":12,"n":"HIP HOP 6","i":{"BD":[1,3,11,12,16],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":12,"n":"HIP HOP 7","i":{"BD":[1,8,11,14,16],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":12,"n":"HIP HOP 8","i":{"BD":[1,4,9,11,12],"SN":[5,13],"CH":[1,2,4,5,7,8,9,10,12,13,15,16],"OH":[6,14]}},{"s":12,"n":"TRAP - A","i":{"BD":[1,7,13],"SN":[9],"CH":[1,3,5,7,9,11,13,15]}},{"s":12,"n":"TRAP - B","i":{"BD":[3,5],"SN":[9],"CH":[3,5,7,9,11,15]}},{"s":12,"n":"PLANET ROCK - A","i":{"CH":[1,3,4,5,7,8,9,11,12,13,14,15,16],"CB":[1,3,5,7,8,10,12,13,15],"SN":[5,13],"BD":[1,7],"HC":[5,13]}},{"s":12,"n":"PLANET ROCK - B","i":{"CH":[1,3,4,5,7,8,9,11,12,13,14,15,16],"CB":[1,3,5,7,8,10,12,13,15],"SN":[5,13],"BD":[1,7,11,14],"HC":[5,13]}},{"s":12,"n":"INNA CLUB","i":{"OH":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[3,8,11,16],"HC":[5,13]}},{"s":12,"n":"ICE","i":{"SN":[5,13],"BD":[1,7,11,15],"SH":[1,3,5,7,9,11,13,15]}},{"s":12,"n":"BACK TO CALI - A","i":{"CH":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,7],"HC":[5,7,9,13,15]}},{"s":12,"n":"BACK TO CALI - B","i":{"CH":[1,3,5,7,9,11,15],"OH":[13],"SN":[5,13],"BD":[1,7,11,14],"HC":[1,5,7,9,13]}},{"s":12,"n":"SNOOP STYLES","i":{"RS":[3,6,9,12],"OH":[1,4,7,11],"SN":[5,13],"BD":[1,4,7,11],"HC":[5,13]}},{"s":12,"n":"THE GROOVE - A","i":{"CH":[1,3,5,7,9,11,13,15],"OH":[8],"SN":[5,13],"BD":[1,4,8,12,15],"SH":[5,13]}},{"s":12,"n":"THE GROOVE - B","i":{"CH":[1,3,5,7,9,11,13,14],"OH":[8,11,12,13,15],"SN":[5,13],"HT":[10,11],"MT":[12,14],"LT":[15,16],"BD":[1,4,8,12],"SH":[5,13]}},{"s":12,"n":"BOOM BAP","i":{"CB":[9],"OH":[15],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"CL":[3,7,11,15],"SN":[3,7,11,15],"BD":[1,3,6,10,14]}},{"s":12,"n":"MOST WANTED - A","i":{"CH":[1,3,5,7,9,11,13,15],"CY":[1],"SN":[5,13],"BD":[1,7,9,10,16],"HC":[5,13]}},{"s":12,"n":"MOST WANTED - B","i":{"CH":[1,5,7,9,11,13,15],"OH":[3],"SN":[5,13],"BD":[3,7,9,10],"HC":[5,13]}},{"s":10,"n":"AMEN BREAK - A","i":{"BD":[1,3,11,12],"SN":[5,8,10,13,16],"CH":[1,3,5,7,9,11,13,15]}},{"s":10,"n":"AMEN BREAK - B","i":{"BD":[1,3,11,12],"SN":[8,10,13,16],"CH":[1,3,5,7,9,11,13,15],"RS":[5]}},{"s":10,"n":"AMEN BREAK - C","i":{"BD":[1,3,11],"SN":[8,10,13,16],"CH":[1,3,5,7,9,11,13,15],"RS":[15]}},{"s":10,"n":"AMEN BREAK - D","i":{"BD":[1,3,11],"SN":[2,5,8,10,15],"CH":[1,3,5,7,9,13,15],"CY":[11]}},{"s":10,"n":"THE FUNKY DRUMMER","i":{"BD":[1,3,7,11,14],"SN":[5,8,10,12,13,16],"CH":[1,2,3,4,5,6,7,9,10,11,12,13,15,16],"OH":[8,14]}},{"s":10,"n":"IMPEACH THE PRESIDENT","i":{"BD":[1,8,9,15],"SN":[5,13],"CH":[1,3,5,7,8,9,13,15],"OH":[11]}},{"s":10,"n":"WHEN THE LEVEE BREAKS","i":{"BD":[1,2,8,11,12],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":10,"n":"IT\u2019S A NEW DAY","i":{"BD":[1,3,11,12,16],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":10,"n":"THE BIG BEAT","i":{"BD":[1,4,7,9],"SN":[5,13],"CH":[5,13]}},{"s":10,"n":"ASHLEY\u2019S ROACHCLIP","i":{"BD":[1,3,7,9,10],"SN":[5,13],"CH":[1,3,5,7,9,13,15],"OH":[11],"CB":[1,3,5,7,9,11,13,15]}},{"s":10,"n":"PAPA WAS TOO","i":{"BD":[1,8,9,11,16],"SN":[5,13],"CH":[5,9,11,13,15,16],"CY":[5]}},{"s":10,"n":"SUPERSTITION","i":{"BD":[1,5,9,13],"SN":[5,13],"CH":[1,3,5,7,8,9,10,11,13,15,16]}},{"s":10,"n":"CISSY STRUT - A","i":{"BD":[1,4,6,10,12,13,15],"SN":[5,8,10,11],"CY":[13,15]}},{"s":10,"n":"CISSY STRUT - B","i":{"BD":[1,4,8,10,12,13,15],"SN":[3,6,7,9,10]}},{"s":10,"n":"CISSY STRUT - C","i":{"BD":[1,5,8,10,12,13,15],"SN":[3,5,6,7,10],"CY":[13,15]}},{"s":10,"n":"CISSY STRUT - D","i":{"BD":[1,5,8,10,12,13,15],"SN":[1,3,6,9,10],"CY":[13,15]}},{"s":10,"n":"HOOK AND SLING - A","i":{"BD":[1,3,10,14,15],"SN":[5,7,8,11,13],"CY":[1,3,4,6,9,10,12,15]}},{"s":10,"n":"HOOK AND SLING - B","i":{"BD":[15],"SN":[1,5,6,8,11,12,15,16],"CY":[1,2,4,7,9,10,13,15]}},{"s":10,"n":"HOOK AND SLING - C","i":{"BD":[1,2,13,14,16],"SN":[3,5,7,8,11,12,15],"CY":[1,3,5,6,8,10,13,14]}},{"s":10,"n":"HOOK AND SLING - D","i":{"BD":[1,3,6,12,14,15],"SN":[5,8,11,16],"CY":[1,3,5,6,8]}},{"s":10,"n":"KISSING MY LOVE - A","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"SN":[5,8,10,13],"BD":[1,2,4,12,15]}},{"s":10,"n":"KISSING MY LOVE - B","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"SN":[5,8,10,13,16],"BD":[1,2,4,12,14]}},{"s":10,"n":"KISSING MY LOVE - C","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"SN":[5,8,10,16],"BD":[1,2,4,11,13,14]}},{"s":10,"n":"KISSING MY LOVE - D","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"SN":[5,10,13],"BD":[1,4,12,15]}},{"s":10,"n":"KISSING MY LOVE - E","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],"SN":[5,8,10,13],"BD":[1,12,14]}},{"s":10,"n":"LADY - A","i":{"CY":[3,7],"SN":[5,6],"BD":[1,9,12,15]}},{"s":10,"n":"LADY - B","i":{"CY":[3,7],"SN":[5,6,9],"BD":[1,12,15]}},{"s":10,"n":"KNOCKS ME OFF MY FEET - A","i":{"CY":[1,3,7,8,10,11,15],"SN":[5,13],"BD":[1,3,5,8,9,11,13,16]}},{"s":10,"n":"KNOCKS ME OFF MY FEET - B","i":{"CY":[1,3,7,8,10,11,15],"SN":[5,13],"BD":[1,3,5,8,9,11,13,16]}},{"s":10,"n":"THE THRILL IS GONE","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[1,5,9,13],"BD":[8,9,11]}},{"s":10,"n":"POP TECH - A","i":{"CY":[1,9],"SN":[5,13],"BD":[1]}},{"s":10,"n":"POP TECH - B","i":{"CY":[1,9],"SN":[5,13],"BD":[2,14,15,16]}},{"s":10,"n":"YA MAMA - A","i":{"CY":[5,13],"BD":[1,9]}},{"s":10,"n":"YA MAMA - B","i":{"CY":[5,13],"BD":[1,8,9]}},{"s":10,"n":"COLD SWEAT - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,8,15],"BD":[1,9,11]}},{"s":10,"n":"COLD SWEAT - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,5,8,10,13],"BD":[3,9,11,15]}},{"s":10,"n":"I GOT YOU (I FEEL GOOD) - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,11]}},{"s":10,"n":"I GOT YOU (I FEEL GOOD) - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[3,7,11,15]}},{"s":10,"n":"THE SAME BLOOD","i":{"CY":[1,3,5,7,8,9,11,12,13,15,16],"SN":[4,6,7,13,14,15],"BD":[1,2,9,10]}},{"s":10,"n":"GROOVE ME","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,4,5,8,9,10,12,14,16]}},{"s":10,"n":"LOOK-KA PY PY - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,5,8,9,11,15],"BD":[1,4,6,11,14,15]}},{"s":10,"n":"LOOK-KA PY PY - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,5,6,8,9,11,15],"BD":[1,4,6,8,9,11,14,15]}},{"s":10,"n":"USE ME - A","i":{"CY":[1,3,5,6,7,8,9,10,11,13,14,15,16],"SN":[3,5,7,8,10,11,13,15,16],"BD":[1,5,13]}},{"s":10,"n":"USE ME - B","i":{"CY":[1,2,3,5,6,7,8,9,10,11,13,14,15,16],"SN":[2,3,5,7,8,10,11,13,15,16],"BD":[5,8,11,13]}},{"s":10,"n":"USE ME - C","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"SN":[5,8,10,13,16],"BD":[1,3,6,8,9,11,12,14,16]}},{"s":10,"n":"USE ME - D","i":{"CY":[1,2,3,4,5,6,7,8,9,10,12,14,16],"SN":[5,8,16],"BD":[1,3,6,9,10,12,14,16]}},{"s":10,"n":"FUNKY PRESIDENT","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,4,8,10,11]}},{"s":10,"n":"GET UP - A","i":{"CY":[1,3,5,7,8,9,11,13,15,16],"SN":[5,7,8,10,13,16],"BD":[1,11,15]}},{"s":10,"n":"GET UP - B","i":{"CY":[1,3,5,7,8,9,11,13,15],"SN":[5,7,8,10,13,16],"BD":[1,11,15]}},{"s":10,"n":"EXPENSIVE SHIT","i":{"CY":[1,3,4,5,7,8,9,11,12,13,15,16],"SN":[1,2,4,6,9,10,13,14],"BD":[4,7,15]}},{"s":10,"n":"CHUG CHUG CHUG-A-LUG","i":{"CY":[1,3,5,6,7,9,10,11,13,15],"SN":[2,3,5,8,10,11,13],"BD":[1,4,6,8,10,12,15]}},{"s":10,"n":"THE FEZ - A","i":{"CY":[3,7,11,15],"SN":[2,4,5,6,8,10,12,13,14,16],"BD":[1,9]}},{"s":10,"n":"THE FEZ - B","i":{"CY":[3,7,11,15],"SN":[2,4,5,6,8,10,12,13,14,16],"BD":[1,9,12,15]}},{"s":10,"n":"ROCK STEADY","i":{"CY":[1,3,5,7,8,9,11,13,15,16],"SN":[2,5,6,8,10,13,14,16],"BD":[3,5,8,11,13]}},{"s":10,"n":"SYNTHETIC SUBSTITUTION - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,9],"BD":[1,3,8,10,11,12,16]}},{"s":10,"n":"SYNTHETIC SUBSTITUTION - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,9],"BD":[1,3,8,10,11,12,16]}},{"s":10,"n":"COW\u2019D BELL - A","i":{"CB":[1,3,4,5,7,8,9,11,12,13,15,16],"SN":[2,4,5,6,8,10,12,13,14,16],"BD":[1,4,7,8,11,12,14,16]}},{"s":10,"n":"COW\u2019D BELL - B","i":{"CB":[1,3,4,5,7,8,9,11,12,13,15,16],"SN":[2,4,5,6,8,10,12,13,14,16],"BD":[1,3,4,8,9,11,12,14,16]}},{"s":10,"n":"PALM GREASE - A","i":{"CY":[1,2,3,4,6,7,9,11,12,14,15],"SN":[5,8,10,13,16],"BD":[1,9,16]}},{"s":10,"n":"PALM GREASE - B","i":{"CY":[1,3,11],"SN":[2,6,15],"BD":[3]}},{"s":10,"n":"O-O-H CHILD - A","i":{"CY":[1,2,3,5,6,7,9,10,11,13,14,15],"SN":[2,4,5,7,8,10,12,13,14,16],"BD":[1,3,9,11,12]}},{"s":10,"n":"^      ^      ^      ^","i":{"CY":[1,2,3,5,6,7,9,10,11,13,14,15],"SN":[2,4,5,7,8,10,13,15],"BD":[1,3,9,11,12]}},{"s":10,"n":"LADY MARMALADE - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,3,7,9,15]}},{"s":10,"n":"LADY MARMALADE - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,9],"BD":[13]}},{"s":10,"n":"HOT SWEAT - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,8,9,10,13,15,16],"BD":[1,11]}},{"s":10,"n":"HOT SWEAT - B","i":{"CY":[1,3,4,5,7,9,11,12,13,15],"SN":[2,4,5,6,8,10,12,13,14],"BD":[3,4,11,12,15]}},{"s":10,"n":"HAITIAN DIVORCE","i":{"CY":[1,2,3,5,6,7,8,9,10,11,13,14,15,16],"SN":[2,5,7,8,10,13,15,16],"BD":[3,5,11,13]}},{"s":10,"n":"COME DANCING - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,3,5,6,7,10,11,13,14,15],"BD":[1,8,9,16]}},{"s":10,"n":"COME DANCING - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,5,6,10,13,14,15],"BD":[1,3,6,8,9,16]}},{"s":10,"n":"RESPECT YOURSELF - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,11,13],"BD":[1,5,9,13]}},{"s":10,"n":"RESPECT YOURSELF - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,9,11,13],"BD":[1,5,9,13]}},{"s":10,"n":"EXPRESS YOURSELF - A","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"SN":[5,8,10,12,14,16],"BD":[1,4,9,12,15]}},{"s":10,"n":"EXPRESS YOURSELF - B","i":{"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"SN":[5,8,10,12,13],"BD":[1,4,9,12,15]}},{"s":10,"n":"LET A WOMAN BE A WOMAN","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,8,10,11,13,14],"BD":[3,9,11,12,14,15]}},{"s":10,"n":"LET A MAN BE A MAN","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,8,10,12,13],"BD":[3,11,15]}},{"s":10,"n":"BOOKS OF MOSES - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,5,9,12]}},{"s":10,"n":"BOOKS OF MOSES - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[5,13],"BD":[1,5,9]}},{"s":10,"n":"MOTHER POPCORN - A","i":{"CY":[1,5,9,13],"SN":[5,8,10,15],"BD":[1,3,11]}},{"s":10,"n":"MOTHER POPCORN - B","i":{"CY":[1,5,9,13],"SN":[2,4,5,6,8,10,12,13,14,16],"BD":[3,7,11,15]}},{"s":10,"n":"STRT BTS - A","i":{"CY":[2,3,5,6,8,9,14,15],"SN":[2,5,8,12,13],"BD":[1,4,7,11]}},{"s":10,"n":"STRT BTS - B","i":{"CY":[2,3,5,6,8,9,14,15],"SN":[2,5,8,13],"BD":[1,4,7,11]}},{"s":10,"n":"I GOT THE FEELIN\u2019 - A","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[7,10,15],"BD":[1,3,11]}},{"s":10,"n":"I GOT THE FEELIN\u2019 - B","i":{"CY":[1,3,5,7,9,11,13,15],"SN":[2,5,6,8,10,11,12,14,15,16],"BD":[3,9,13,15]}},{"s":10,"n":"MORE BOUNCE TO THE OUNCE","i":{"CH":[3,5,7,9,11,13,15],"OH":[1],"HC":[5,13],"SN":[5,13],"BD":[1,9,10]}},{"s":0,"n":"SON CLAVE","i":{"BD":[1,4,5,8,9,12,13,16],"RS":[1,4,7,11,13],"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}},{"s":0,"n":"RUMBA","i":{"BD":[1,4,5,8,9,12,13,16],"RS":[1,4,8,11,13],"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}},{"s":0,"n":"BOSSA NOVA","i":{"BD":[1,4,5,8,9,12,13,16],"RS":[1,4,7,11,14],"CY":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}},{"s":0,"n":"BOUTON","i":{"BD":[1,9,11,15],"RS":[4,7,13],"CH":[1,3,4,5,7,9,11,13,15]}},{"s":0,"n":"GAHU","i":{"BD":[1,5,9,13,15],"RS":[3,4,7,8,11,12,15,16],"CB":[1,4,7,11,15]}},{"s":0,"n":"SHIKO","i":{"BD":[1,5,7,9,13,15],"RS":[3,4,7,8,11,12,15,16],"CB":[1,5,7,11,13]}},{"s":0,"n":"SOUKOUS","i":{"BD":[1,5,9,13,15],"RS":[1,4,7,9,12,15],"CB":[1,4,7,10,11]}},{"s":6,"n":"DRUM AND BASS 1 - A","i":{"BD":[1,4,8,10,11,16],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":6,"n":"DRUM AND BASS 1 - B","i":{"BD":[1,3,8,9,10,11],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":6,"n":"DRUM AND BASS 2 - A","i":{"BD":[1,8,10,12,16],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":6,"n":"DRUM AND BASS 2 - B","i":{"BD":[1,12],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15,16]}},{"s":6,"n":"DRUM AND BASS 3","i":{"BD":[1,11],"SN":[5,13],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[7,8,9,10]}},{"s":6,"n":"DRUM AND BASS 4 - A","i":{"BD":[1,7],"SN":[5,11,13],"CH":[1,3,5,7,9,11,13,15],"OH":[1]}},{"s":6,"n":"DRUM AND BASS 4 - B","i":{"BD":[5,11],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15]}},{"s":6,"n":"JUNGLE - A","i":{"BD":[1,3,11],"SN":[5,8,10,15],"CH":[1,3,5,7,9,11,13,15],"OH":[1]}},{"s":6,"n":"JUNGLE - B","i":{"BD":[2,3,11],"SN":[2,5,8,10,15],"CH":[1,3,5,7,9,11,13,15]}},{"s":8,"n":"TECHNO","i":{"BD":[1,5,9,13,15],"SN":[5,13],"CH":[10],"OH":[3,7,11,15]}},{"s":8,"n":"DUBSTEP - A","i":{"BD":[1,11],"SN":[9],"CH":[2,3,7,12,15],"OH":[5,14]}},{"s":8,"n":"DUBSTEP - B","i":{"BD":[1,4,7,11],"SN":[9],"CH":[2,3,7,12,15],"OH":[5,14]}},{"s":8,"n":"DUBSTEP - RATCHETED","i":{"BD":[1,4,9,12],"SN":[5,13,16],"CH":[1,2,6,7,8,9,10,12,13,14,16],"OH":[7]}},{"s":8,"n":"UK GARAGE - A","i":{"BD":[1,11],"CL":[5,13],"CH":[3,4,7,11,15,16],"RS":[2,8,14],"MT":[6,12]}},{"s":8,"n":"UK GARAGE - B","i":{"BD":[1,11],"CL":[5,13],"CH":[3,7,11,15],"RS":[8,14],"MT":[6,12]}},{"s":8,"n":"SYNTH WAVE","i":{"BD":[1,9],"SN":[5,13],"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[14]}},{"s":7,"n":"HALF DROP","i":{"BD":[1],"SN":[9],"CH":[1,3,5,7,9,11,13,15]}},{"s":7,"n":"ONE DROP","i":{"BD":[9],"SN":[9],"CH":[1,3,5,7,9,11,13,15]}},{"s":7,"n":"TWO DROP","i":{"BD":[1,9],"SN":[9],"CH":[1,3,5,7,9,11,13,15]}},{"s":7,"n":"STEPPERS","i":{"BD":[1,5,9,13],"SN":[9],"CH":[1,3,5,7,9,11,13,15]}},{"s":18,"n":"REGGAETON 1","i":{"BD":[1,5,9,13],"SN":[4,7,12,15],"CH":[1,3,5,7,9,11,13,15]}},{"s":18,"n":"REGGAETON 2","i":{"CH":[3,7,11,15],"SN":[4,6,7,8,11,12,15],"BD":[1,8]}},{"s":18,"n":"REGGAETON 3 - A","i":{"SN":[1,4,7,9,12,15],"BD":[1,9]}},{"s":18,"n":"REGGAETON 3 - B","i":{"CH":[1,4,7,9,12,15],"SN":[1,4,7,9,12,15],"BD":[1,9]}},{"s":17,"n":"POP 1 - A","i":{"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[1,4,7,9,10],"RS":[1,2,4,7,8,11,12],"SN":[5,13],"BD":[1,2,4,8,11],"HC":[5,13]}},{"s":17,"n":"IN THE AIR LAST NIGHT - A","i":{"HT":[3,7],"OH":[1,13],"CH":[3,7,11,13],"SN":[13],"BD":[11]}},{"s":17,"n":"IN THE AIR LAST NIGHT - B","i":{"HT":[3,7],"OH":[1,13],"CH":[3,7,11,13],"SN":[13],"BD":[1,3,5,7,9,11,15]}},{"s":17,"n":"NINETEEN - A","i":{"CH":[1,4,7,9,10],"OH":[1,4,7,9,10],"RS":[1,2,4,7,8,11,12],"BD":[1,2,4,8,11],"HC":[5,13]}},{"s":17,"n":"NINETEEN - B","i":{"CH":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"OH":[1,4,7,9,10],"RS":[1,2,4,7,8,11,12],"SN":[5,13],"BD":[1,2,4,8,11],"HC":[5,13]}},{"s":17,"n":"BLEU MONDAY - A","i":{"OH":[3,7,11,15],"SN":[5,13],"BD":[1,9],"HC":[5,13]}},{"s":17,"n":"BLEU MONDAY - B","i":{"CH":[1,4,5,8,9,12,13,16],"OH":[3,7,11,15],"SN":[5,13],"BD":[1,9],"HC":[5,13]}},{"s":2,"n":"STANDARD BREAKBEAT 1","i":{"BD":[1,11],"SN":[5,13]}},{"s":2,"n":"STANDARD BREAKBEAT 2","i":{"BD":[1,3,11],"SN":[5,13]}},{"s":2,"n":"STANDARD BREAKBEAT 3","i":{"BD":[1,3,7,11],"SN":[5,8,10,13]}},{"s":2,"n":"POLYRHYTHMIC - A","i":{"BD":[1,7],"SN":[3,5,9,11,12,13,15,16]}},{"s":2,"n":"POLYRHYTHMIC - B","i":{"BD":[3,9],"SN":[5,7,11,13]}},{"s":14,"n":"HYBRID KICK","i":{"BD":[1,9],"SN":[5,13]}},{"s":14,"n":"\u21b3 FOLLOW WITH HYBRID BREAK ENDING 1","i":{"BD":[1,11],"SN":[5,10,13]}},{"s":14,"n":"\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 2","i":{"BD":[1,7,9,12],"SN":[5,13]}},{"s":14,"n":"\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 3","i":{"BD":[1,8,11],"SN":[5,13]}},{"s":14,"n":"\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 4","i":{"BD":[1,10],"SN":[5,13]}},{"s":14,"n":"\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 5","i":{"BD":[1,3,9,11],"SN":[5,13]}},{"s":14,"n":"\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 6","i":{"BD":[1,6,8,10,11],"SN":[5,13]}},{"s":14,"n":"HYBRID KICK 7 - A","i":{"BD":[1,3,9,11],"SN":[5,13]}},{"s":14,"n":"\u21b3 FOLLOW WITH HYBRID BREAK 7 - B","i":{"BD":[1,2,9,11],"SN":[5,13]}},{"s":14,"n":"HYBRID 8 - A","i":{"BD":[1,9,11],"SN":[5,13]}},{"s":14,"n":"\u21b3 FOLLOW WITH HYBRID BREAK 8 - B","i":{"BD":[1,2,9,11],"SN":[5,13]}},{"s":15,"n":"IRREGULAR 1 - A","i":{"BD":[1,3,4,7,11],"SN":[5,8,13,16]}},{"s":15,"n":"IRREGULAR 1 - B","i":{"BD":[1,3,8,11],"SN":[5,13,16]}},{"s":15,"n":"IRREGULAR 2 - A","i":{"BD":[1,8,11],"SN":[4,13]}},{"s":15,"n":"IRREGULAR 2 - B","i":{"BD":[1,3,7,11],"SN":[5,9,13]}},{"s":15,"n":"IRREGULAR 3","i":{"BD":[1,4,9,15],"SN":[2,5,11,14]}},{"s":20,"n":"ROLLING 1","i":{"BD":[1,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 2","i":{"BD":[1,11,14],"SN":[5,13]}},{"s":20,"n":"ROLLING 3 - A","i":{"BD":[1,7,13],"SN":[5,11]}},{"s":20,"n":"ROLLING 3 - B","i":{"BD":[1,7,13],"SN":[5,11,15]}},{"s":20,"n":"ROLLING 4 - A","i":{"BD":[1,2],"SN":[5,13]}},{"s":20,"n":"ROLLING 4 - B","i":{"BD":[1,8,10,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 5 - A","i":{"BD":[1,3,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 5 - B","i":{"BD":[1,4,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 6 - A","i":{"BD":[1,7,12],"SN":[5,13]}},{"s":20,"n":"ROLLING 6 - B","i":{"BD":[1,3,8,11,14],"SN":[5,13]}},{"s":20,"n":"ROLLING 7 - A","i":{"BD":[1,8,9,12],"SN":[5,13]}},{"s":20,"n":"ROLLING 7 - B","i":{"BD":[1,4,8,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 7 - C","i":{"BD":[1,8,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 7 - D","i":{"BD":[1,4,8,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 8","i":{"BD":[1,8],"SN":[5,13]}},{"s":20,"n":"ROLLING 9 - A","i":{"BD":[1,9,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 9 - B","i":{"BD":[1,2,9,11],"SN":[5,13]}},{"s":20,"n":"ROLLING 10","i":{"BD":[1,8,12],"SN":[5,13]}},{"s":20,"n":"ROLLING 11","i":{"BD":[1,6,7,10,11],"SN":[5,13]}},{"s":4,"n":"CONTEMPORARY SNARE 1 - A","i":{"BD":[1,11],"SN":[5,10,15]}},{"s":4,"n":"CONTEMPORARY SNARE 1 - B","i":{"BD":[3,11],"SN":[7,10,13]}},{"s":4,"n":"CONTEMPORARY SNARE 2 - A","i":{"BD":[1,3,11],"SN":[5,13]}},{"s":4,"n":"CONTEMPORARY SNARE 2 - B","i":{"BD":[3,11,12],"SN":[5,10,13]}},{"s":4,"n":"CONTEMPORARY SNARE 3 - A","i":{"BD":[1,7,15],"SN":[5,11,14,16]}},{"s":4,"n":"CONTEMPORARY SNARE 3 - B","i":{"BD":[1,4,7,15],"SN":[5,11]}},{"s":4,"n":"UNCONVENTIONAL SNARE 1 - A","i":{"BD":[1,5,11],"SN":[9,15]}},{"s":4,"n":"UNCONVENTIONAL SNARE 1 - B","i":{"BD":[1,7,11],"SN":[5,13]}},{"s":4,"n":"UNCONVENTIONAL SNARE 2 - A","i":{"BD":[1,13],"SN":[5,9,12]}},{"s":4,"n":"UNCONVENTIONAL SNARE 2 - B","i":{"BD":[1,5,9,11],"SN":[8,13]}},{"s":4,"n":"UNCONVENTIONAL SNARE 3 - A","i":{"BD":[1,7,14],"SN":[5,11]}},{"s":4,"n":"UNCONVENTIONAL SNARE 3 - B","i":{"BD":[1,5,9,11],"SN":[8,13]}},{"s":4,"n":"UNCONVENTIONAL SNARE 4 - A","i":{"BD":[1,3,7,9],"SN":[5,11]}},{"s":4,"n":"UNCONVENTIONAL SNARE 4 - B","i":{"BD":[3,11],"SN":[1,5,10,13]}},{"s":11,"n":"GHOST SNARE 1 - A","i":{"SN":[5,8,10,13,16]}},{"s":11,"n":"GHOST SNARE 1 - B","i":{"SN":[5,8,10,13]}},{"s":11,"n":"GHOST SNARE 2 - A","i":{"SN":[2,5,8,13,16]}},{"s":11,"n":"GHOST SNARE 2 - B","i":{"SN":[2,5,10,13,16]}},{"s":3,"n":"CONTEMPORARY KICK 1 - A","i":{"BD":[1,11],"SN":[5,15]}},{"s":3,"n":"CONTEMPORARY KICK 1 - B","i":{"BD":[3,8,11],"SN":[5,13]}},{"s":3,"n":"CONTEMPORARY KICK 2 - A","i":{"BD":[3,8,11],"SN":[5,10,13]}},{"s":3,"n":"CONTEMPORARY KICK 2 - B","i":{"BD":[3,11,14],"SN":[5,13]}},{"s":3,"n":"CONTEMPORARY KICK 3 - A","i":{"BD":[1,11],"SN":[5,15]}},{"s":3,"n":"CONTEMPORARY KICK 3 - B","i":{"BD":[1,9,11],"SN":[5,13]}},{"s":3,"n":"CONTEMPORARY KICK 4","i":{"BD":[1,9],"SN":[5,11]}},{"s":5,"n":"DRUM ROLL 1","i":{"HT":[9,10,11],"MT":[12,13,14],"LT":[15,16],"OH":[1],"CY":[1]}},{"s":5,"n":"DRUM ROLL 2","i":{"BD":[13,15],"SN":[1,3,4,5,7,9,10,11,12]}},{"s":5,"n":"DRUM ROLL 3","i":{"SN":[1,2,3,5,6,7,9,11,13,14,15,16]}},{"s":5,"n":"DRUM ROLL 4","i":{"BD":[1,7,13],"SN":[4,5,8,9,16],"CY":[1,7,13]}},{"s":5,"n":"DRUM ROLL 5","i":{"HT":[1],"MT":[5,9,11],"LT":[13,15]}},{"s":5,"n":"DRUM ROLL 6","i":{"HT":[1],"MT":[5,9,11],"LT":[13,15]}},{"s":5,"n":"DRUM ROLL 7","i":{"HT":[3],"MT":[4,7,8],"LT":[11,12,14],"SN":[1,5,9,13]}},{"s":5,"n":"DRUM ROLL 8","i":{"HT":[3],"MT":[5,9,11,12],"LT":[15,16],"SN":[1,8,13]}},{"s":5,"n":"DRUM ROLL 9","i":{"HT":[3],"MT":[5,11],"LT":[13,15],"SN":[1,2,7,9,10]}},{"s":5,"n":"DRUM ROLL 10","i":{"HT":[3,4],"MT":[7,8,11,12],"LT":[15,16],"SN":[1,2,5,6,9,10,13,14]}},{"s":5,"n":"DRUM ROLL 11","i":{"HT":[2,14],"MT":[5,8],"LT":[11,15,16],"SN":[1,4,7,10,13],"BD":[3,6,9,12]}},{"s":5,"n":"DRUM ROLL 12","i":{"HT":[3,10],"MT":[11,13],"LT":[12,14,15],"SN":[1,2,9,13],"BD":[5,7],"CY":[5,7]}},{"s":5,"n":"DRUM ROLL 13","i":{"HT":[2],"MT":[6,10],"LT":[14],"SN":[1,5,9,13],"BD":[3,4,7,8,11,12,15,16]}},{"s":5,"n":"DRUM ROLL 14","i":{"HT":[10,11,12,13],"MT":[4,5,6,7,8,9,14,15],"LT":[1,2,3,16]}},{"s":5,"n":"DRUM ROLL 15","i":{"HT":[2,10],"LT":[4,8,12,16],"SN":[1,5,9,13]}},{"s":5,"n":"DRUM ROLL 16","i":{"SN":[1,2,7,8,13,14],"BD":[3,5,11,15],"CH":[3,9,15],"CY":[5,11]}},{"s":5,"n":"DRUM ROLL 17","i":{"HT":[3,4],"MT":[9,10],"SN":[1,2,5,7,8,11,13,14,15,16],"CY":[5,11]}},{"s":5,"n":"DRUM ROLL 18","i":{"SN":[1,7],"BD":[3,5,9,11,15],"CY":[1,7,13]}},{"s":5,"n":"DRUM ROLL 19","i":{"SN":[1,2,7,8,13,14],"BD":[3,5,9,11,15],"CY":[3,5,9,11,15]}},{"s":5,"n":"DRUM ROLL 20","i":{"HT":[3,5],"MT":[7,15],"LT":[16],"SN":[1,9,11,14],"BD":[2,4,6,8,10,12,13],"CY":[9]}}];
+const DRUM_SECTIONS = ["Afro-Cuban","Basic Patterns","Breaks","Breaks - Kick","Breaks - Snare","Drum Rolls","Drum and Bass","Dub","EDM","Electro","Funk and Soul","Ghost Snares","Hip Hop","House","Hybrid Breaks With Alternate Endings","Irregular Breaks","Miami Bass","Pop","Reggaeton","Rock","Rolling Breaks","Standard Breaks","Uncategorized","Tribal"];
+const DRUM_PATTERNS_YAML = `
+source: Pocket Operations
+total_patterns: 270
+legend: {BD: Bass Drum, SN: Snare, CH: Closed Hi-Hat, OH: Open Hi-Hat, LT: Low Tom,
+  MT: Mid Tom, HT: High Tom, CL: Clap, SH: Shaker, RS: Rimshot, CB: Cowbell, CY: Cymbal,
+  HC: High Conga, AC: Accent, LC: Low Conga}
+patterns:
+- name: EXAMPLE PATTERN
+  section: Uncategorized
+  page: 5
+  instruments:
+    BD: [1, 9]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ONE AND SEVEN & FIVE AND THIRTEEN
+  section: Basic Patterns
+  page: 7
+  instruments:
+    BD: [1, 7]
+    SN: [5, 13]
+- name: "BOOTS N\u2019 CATS"
+  section: Basic Patterns
+  page: 7
+  instruments:
+    BD: [1, 9]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: TINY HOUSE
+  section: Basic Patterns
+  page: 7
+  instruments:
+    OH: [3, 7, 11, 15]
+    BD: [1, 5, 9, 13]
+- name: GOOD TO GO
+  section: Basic Patterns
+  page: 7
+  instruments:
+    BD: [1, 4, 7, 11]
+    SN: [5, 13]
+- name: HIP HOP
+  section: Basic Patterns
+  page: 7
+  instruments:
+    BD: [1, 3, 7, 8, 15]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: STANDARD BREAK 1
+  section: Standard Breaks
+  page: 8
+  instruments:
+    BD: [1, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 10, 11, 13, 15]
+- name: STANDARD BREAK 2
+  section: Standard Breaks
+  page: 8
+  instruments:
+    BD: [1, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 8, 9, 11, 15]
+- name: ROLLING BREAK
+  section: Standard Breaks
+  page: 8
+  instruments:
+    BD: [1, 8, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: THE UNKNOWN DRUMMER
+  section: Standard Breaks
+  page: 8
+  instruments:
+    BD: [1, 4, 7, 11]
+    SN: [2, 5, 8, 13]
+    CH: [2, 3, 5, 6, 8, 14]
+    OH: [9, 15]
+- name: ROCK 1
+  section: Rock
+  page: 9
+  instruments:
+    BD: [1, 8, 9, 11]
+    SN: [5, 13]
+    CY: [1]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ROCK 2
+  section: Rock
+  page: 9
+  instruments:
+    BD: [1, 8, 9, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ROCK 3
+  section: Rock
+  page: 9
+  instruments:
+    BD: [1, 8, 9, 11]
+    SN: [5, 13]
+    OH: [15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ROCK 4
+  section: Rock
+  page: 9
+  instruments:
+    BD: [1, 8, 9, 11]
+    SN: [5, 13, 15, 16]
+    OH: [15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ELECTRO 1 - A
+  section: Electro
+  page: 10
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7]
+- name: ELECTRO 1 - B
+  section: Electro
+  page: 10
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7, 11, 15]
+- name: ELECTRO 2 - A
+  section: Electro
+  page: 10
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7]
+- name: ELECTRO 2 - B
+  section: Electro
+  page: 10
+  instruments:
+    SN: [5, 13]
+    BD: [1, 11, 14]
+- name: ELECTRO 3 - A
+  section: Electro
+  page: 10
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7, 12]
+- name: ELECTRO 3 - B
+  section: Electro
+  page: 11
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7, 12, 14]
+- name: ELECTRO 4
+  section: Electro
+  page: 11
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7, 11, 14]
+- name: SIBERIAN NIGHTS
+  section: Electro
+  page: 11
+  instruments:
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+    SN: [5, 13]
+    BD: [1, 7]
+- name: NEW WAVE
+  section: Electro
+  page: 11
+  instruments:
+    BD: [1, 7, 9, 10]
+    SN: [5, 13]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [3]
+    SH: [5, 13]
+- name: HOUSE
+  section: House
+  page: 12
+  instruments:
+    BD: [1, 5, 9, 13]
+    SN: [5, 13]
+    CY: [1]
+    OH: [3, 7, 11, 15]
+- name: HOUSE 2
+  section: House
+  page: 12
+  instruments:
+    BD: [1, 5, 9, 13]
+    SN: [5, 13]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [3, 6, 11, 14]
+- name: BRIT HOUSE
+  section: House
+  page: 12
+  instruments:
+    BD: [1, 5, 9, 13]
+    CL: [5, 13]
+    CY: [3, 7, 11, 15]
+    CH: [1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16]
+    OH: [3, 7, 11, 15]
+- name: FRENCH HOUSE
+  section: House
+  page: 12
+  instruments:
+    BD: [1, 5, 9, 13]
+    CL: [5, 13]
+    SH: [1, 2, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [2, 4, 6, 8, 10, 12, 14, 16]
+- name: DIRTY HOUSE
+  section: House
+  page: 13
+  instruments:
+    BD: [1, 3, 5, 9, 11, 13, 16]
+    SN: [5, 13]
+    CL: [3, 5, 9, 11, 13]
+    CH: [11, 16]
+    OH: [3, 11, 15]
+- name: DEEP HOUSE
+  section: House
+  page: 13
+  instruments:
+    BD: [1, 5, 9, 13]
+    CL: [5, 13]
+    CH: [2, 8, 10]
+    OH: [3, 7, 11, 15]
+- name: DEEPER HOUSE
+  section: House
+  page: 13
+  instruments:
+    BD: [1, 5, 9, 13]
+    CL: [2, 10]
+    MT: [3, 8, 11]
+    SH: [4, 9]
+    OH: [3, 7, 11, 12, 15]
+- name: SLOW DEEP HOUSE
+  section: House
+  page: 14
+  instruments:
+    BD: [1, 5, 9, 13]
+    CL: [5, 13]
+    SH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    CH: [1, 5, 9, 13]
+    OH: [3, 4, 7, 8, 10, 11, 13]
+- name: FOOTWORK - A
+  section: House
+  page: 14
+  instruments:
+    BD: [1, 4, 7, 9, 12, 15]
+    CL: [13]
+    CH: [3, 11]
+    RS: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+- name: FOOTWORK - B
+  section: House
+  page: 14
+  instruments:
+    BD: [1, 4, 7, 9, 12, 15]
+    CL: [13]
+    CH: [3, 7, 8, 11, 15]
+    RS: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+- name: MIAMI BASS - A
+  section: Miami Bass
+  page: 15
+  instruments:
+    BD: [1, 7]
+    SN: [5, 13]
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+- name: MIAMI BASS - B
+  section: Miami Bass
+  page: 15
+  instruments:
+    BD: [1, 7, 11, 14]
+    SN: [5, 13]
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+- name: SALLY
+  section: Miami Bass
+  page: 15
+  instruments:
+    BD: [1, 7, 11, 15]
+    SN: [5, 13]
+    LT: [1, 7, 11, 15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ROCK THE PLANET
+  section: Miami Bass
+  page: 15
+  instruments:
+    BD: [1, 4, 7]
+    SN: [5, 13]
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16]
+- name: HIP HOP 1 - A
+  section: Hip Hop
+  page: 16
+  instruments:
+    BD: [1, 7, 8, 12, 15]
+    SN: [5, 13]
+- name: HIP HOP 1 - B
+  section: Hip Hop
+  page: 16
+  instruments:
+    BD: [1, 8, 12]
+    SN: [5, 13]
+- name: HIP HOP 2 - A
+  section: Hip Hop
+  page: 16
+  instruments:
+    BD: [1, 8, 9, 10, 14, 16]
+    SN: [5, 13]
+- name: HIP HOP 2 - B
+  section: Hip Hop
+  page: 16
+  instruments:
+    BD: [1, 8, 9, 12]
+    SN: [5, 10, 13]
+- name: HIP HOP 3 - A
+  section: Hip Hop
+  page: 16
+  instruments:
+    BD: [1, 3, 9, 11]
+    SN: [5, 13]
+- name: HIP HOP 3 - B
+  section: Hip Hop
+  page: 17
+  instruments:
+    BD: [1, 3, 9, 10, 12]
+    SN: [5, 13]
+- name: HIP HOP 4 - A
+  section: Hip Hop
+  page: 17
+  instruments:
+    BD: [1, 4, 8, 10, 11, 16]
+    SN: [5, 13]
+- name: HIP HOP 4 - B
+  section: Hip Hop
+  page: 17
+  instruments:
+    BD: [1, 3, 8, 9, 10, 11]
+    SN: [5, 13]
+- name: HIP HOP 5
+  section: Hip Hop
+  page: 17
+  instruments:
+    BD: [1, 3, 8, 9, 11, 16]
+    SN: [5, 13]
+- name: HIP HOP 6
+  section: Hip Hop
+  page: 17
+  instruments:
+    BD: [1, 3, 11, 12, 16]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: HIP HOP 7
+  section: Hip Hop
+  page: 18
+  instruments:
+    BD: [1, 8, 11, 14, 16]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: HIP HOP 8
+  section: Hip Hop
+  page: 18
+  instruments:
+    BD: [1, 4, 9, 11, 12]
+    SN: [5, 13]
+    CH: [1, 2, 4, 5, 7, 8, 9, 10, 12, 13, 15, 16]
+    OH: [6, 14]
+- name: TRAP - A
+  section: Hip Hop
+  page: 18
+  instruments:
+    BD: [1, 7, 13]
+    SN: [9]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: TRAP - B
+  section: Hip Hop
+  page: 18
+  instruments:
+    BD: [3, 5]
+    SN: [9]
+    CH: [3, 5, 7, 9, 11, 15]
+- name: PLANET ROCK - A
+  section: Hip Hop
+  page: 19
+  instruments:
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16]
+    CB: [1, 3, 5, 7, 8, 10, 12, 13, 15]
+    SN: [5, 13]
+    BD: [1, 7]
+    HC: [5, 13]
+- name: PLANET ROCK - B
+  section: Hip Hop
+  page: 19
+  instruments:
+    CH: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16]
+    CB: [1, 3, 5, 7, 8, 10, 12, 13, 15]
+    SN: [5, 13]
+    BD: [1, 7, 11, 14]
+    HC: [5, 13]
+- name: INNA CLUB
+  section: Hip Hop
+  page: 19
+  instruments:
+    OH: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [3, 8, 11, 16]
+    HC: [5, 13]
+- name: ICE
+  section: Hip Hop
+  page: 19
+  instruments:
+    SN: [5, 13]
+    BD: [1, 7, 11, 15]
+    SH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: BACK TO CALI - A
+  section: Hip Hop
+  page: 20
+  instruments:
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 7]
+    HC: [5, 7, 9, 13, 15]
+- name: BACK TO CALI - B
+  section: Hip Hop
+  page: 20
+  instruments:
+    CH: [1, 3, 5, 7, 9, 11, 15]
+    OH: [13]
+    SN: [5, 13]
+    BD: [1, 7, 11, 14]
+    HC: [1, 5, 7, 9, 13]
+- name: SNOOP STYLES
+  section: Hip Hop
+  page: 20
+  instruments:
+    RS: [3, 6, 9, 12]
+    OH: [1, 4, 7, 11]
+    SN: [5, 13]
+    BD: [1, 4, 7, 11]
+    HC: [5, 13]
+- name: THE GROOVE - A
+  section: Hip Hop
+  page: 21
+  instruments:
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    OH: [8]
+    SN: [5, 13]
+    BD: [1, 4, 8, 12, 15]
+    SH: [5, 13]
+- name: THE GROOVE - B
+  section: Hip Hop
+  page: 21
+  instruments:
+    CH: [1, 3, 5, 7, 9, 11, 13, 14]
+    OH: [8, 11, 12, 13, 15]
+    SN: [5, 13]
+    HT: [10, 11]
+    MT: [12, 14]
+    LT: [15, 16]
+    BD: [1, 4, 8, 12]
+    SH: [5, 13]
+- name: BOOM BAP
+  section: Hip Hop
+  page: 22
+  instruments:
+    CB: [9]
+    OH: [15]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    CL: [3, 7, 11, 15]
+    SN: [3, 7, 11, 15]
+    BD: [1, 3, 6, 10, 14]
+- name: MOST WANTED - A
+  section: Hip Hop
+  page: 22
+  instruments:
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    CY: [1]
+    SN: [5, 13]
+    BD: [1, 7, 9, 10, 16]
+    HC: [5, 13]
+- name: MOST WANTED - B
+  section: Hip Hop
+  page: 22
+  instruments:
+    CH: [1, 5, 7, 9, 11, 13, 15]
+    OH: [3]
+    SN: [5, 13]
+    BD: [3, 7, 9, 10]
+    HC: [5, 13]
+- name: AMEN BREAK - A
+  section: Funk and Soul
+  page: 23
+  instruments:
+    BD: [1, 3, 11, 12]
+    SN: [5, 8, 10, 13, 16]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: AMEN BREAK - B
+  section: Funk and Soul
+  page: 23
+  instruments:
+    BD: [1, 3, 11, 12]
+    SN: [8, 10, 13, 16]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    RS: [5]
+- name: AMEN BREAK - C
+  section: Funk and Soul
+  page: 23
+  instruments:
+    BD: [1, 3, 11]
+    SN: [8, 10, 13, 16]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    RS: [15]
+- name: AMEN BREAK - D
+  section: Funk and Soul
+  page: 23
+  instruments:
+    BD: [1, 3, 11]
+    SN: [2, 5, 8, 10, 15]
+    CH: [1, 3, 5, 7, 9, 13, 15]
+    CY: [11]
+- name: THE FUNKY DRUMMER
+  section: Funk and Soul
+  page: 24
+  instruments:
+    BD: [1, 3, 7, 11, 14]
+    SN: [5, 8, 10, 12, 13, 16]
+    CH: [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15, 16]
+    OH: [8, 14]
+- name: IMPEACH THE PRESIDENT
+  section: Funk and Soul
+  page: 24
+  instruments:
+    BD: [1, 8, 9, 15]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 8, 9, 13, 15]
+    OH: [11]
+- name: WHEN THE LEVEE BREAKS
+  section: Funk and Soul
+  page: 24
+  instruments:
+    BD: [1, 2, 8, 11, 12]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: "IT\u2019S A NEW DAY"
+  section: Funk and Soul
+  page: 24
+  instruments:
+    BD: [1, 3, 11, 12, 16]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: THE BIG BEAT
+  section: Funk and Soul
+  page: 25
+  instruments:
+    BD: [1, 4, 7, 9]
+    SN: [5, 13]
+    CH: [5, 13]
+- name: "ASHLEY\u2019S ROACHCLIP"
+  section: Funk and Soul
+  page: 25
+  instruments:
+    BD: [1, 3, 7, 9, 10]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 13, 15]
+    OH: [11]
+    CB: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: PAPA WAS TOO
+  section: Funk and Soul
+  page: 25
+  instruments:
+    BD: [1, 8, 9, 11, 16]
+    SN: [5, 13]
+    CH: [5, 9, 11, 13, 15, 16]
+    CY: [5]
+- name: SUPERSTITION
+  section: Funk and Soul
+  page: 25
+  instruments:
+    BD: [1, 5, 9, 13]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 8, 9, 10, 11, 13, 15, 16]
+- name: CISSY STRUT - A
+  section: Funk and Soul
+  page: 26
+  instruments:
+    BD: [1, 4, 6, 10, 12, 13, 15]
+    SN: [5, 8, 10, 11]
+    CY: [13, 15]
+- name: CISSY STRUT - B
+  section: Funk and Soul
+  page: 26
+  instruments:
+    BD: [1, 4, 8, 10, 12, 13, 15]
+    SN: [3, 6, 7, 9, 10]
+- name: CISSY STRUT - C
+  section: Funk and Soul
+  page: 26
+  instruments:
+    BD: [1, 5, 8, 10, 12, 13, 15]
+    SN: [3, 5, 6, 7, 10]
+    CY: [13, 15]
+- name: CISSY STRUT - D
+  section: Funk and Soul
+  page: 26
+  instruments:
+    BD: [1, 5, 8, 10, 12, 13, 15]
+    SN: [1, 3, 6, 9, 10]
+    CY: [13, 15]
+- name: HOOK AND SLING - A
+  section: Funk and Soul
+  page: 27
+  instruments:
+    BD: [1, 3, 10, 14, 15]
+    SN: [5, 7, 8, 11, 13]
+    CY: [1, 3, 4, 6, 9, 10, 12, 15]
+- name: HOOK AND SLING - B
+  section: Funk and Soul
+  page: 27
+  instruments:
+    BD: [15]
+    SN: [1, 5, 6, 8, 11, 12, 15, 16]
+    CY: [1, 2, 4, 7, 9, 10, 13, 15]
+- name: HOOK AND SLING - C
+  section: Funk and Soul
+  page: 27
+  instruments:
+    BD: [1, 2, 13, 14, 16]
+    SN: [3, 5, 7, 8, 11, 12, 15]
+    CY: [1, 3, 5, 6, 8, 10, 13, 14]
+- name: HOOK AND SLING - D
+  section: Funk and Soul
+  page: 27
+  instruments:
+    BD: [1, 3, 6, 12, 14, 15]
+    SN: [5, 8, 11, 16]
+    CY: [1, 3, 5, 6, 8]
+- name: KISSING MY LOVE - A
+  section: Funk and Soul
+  page: 28
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    SN: [5, 8, 10, 13]
+    BD: [1, 2, 4, 12, 15]
+- name: KISSING MY LOVE - B
+  section: Funk and Soul
+  page: 28
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    SN: [5, 8, 10, 13, 16]
+    BD: [1, 2, 4, 12, 14]
+- name: KISSING MY LOVE - C
+  section: Funk and Soul
+  page: 28
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    SN: [5, 8, 10, 16]
+    BD: [1, 2, 4, 11, 13, 14]
+- name: KISSING MY LOVE - D
+  section: Funk and Soul
+  page: 28
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    SN: [5, 10, 13]
+    BD: [1, 4, 12, 15]
+- name: KISSING MY LOVE - E
+  section: Funk and Soul
+  page: 28
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+    SN: [5, 8, 10, 13]
+    BD: [1, 12, 14]
+- name: LADY - A
+  section: Funk and Soul
+  page: 29
+  instruments:
+    CY: [3, 7]
+    SN: [5, 6]
+    BD: [1, 9, 12, 15]
+- name: LADY - B
+  section: Funk and Soul
+  page: 29
+  instruments:
+    CY: [3, 7]
+    SN: [5, 6, 9]
+    BD: [1, 12, 15]
+- name: KNOCKS ME OFF MY FEET - A
+  section: Funk and Soul
+  page: 29
+  instruments:
+    CY: [1, 3, 7, 8, 10, 11, 15]
+    SN: [5, 13]
+    BD: [1, 3, 5, 8, 9, 11, 13, 16]
+- name: KNOCKS ME OFF MY FEET - B
+  section: Funk and Soul
+  page: 29
+  instruments:
+    CY: [1, 3, 7, 8, 10, 11, 15]
+    SN: [5, 13]
+    BD: [1, 3, 5, 8, 9, 11, 13, 16]
+- name: THE THRILL IS GONE
+  section: Funk and Soul
+  page: 30
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [1, 5, 9, 13]
+    BD: [8, 9, 11]
+- name: POP TECH - A
+  section: Funk and Soul
+  page: 30
+  instruments:
+    CY: [1, 9]
+    SN: [5, 13]
+    BD: [1]
+- name: POP TECH - B
+  section: Funk and Soul
+  page: 30
+  instruments:
+    CY: [1, 9]
+    SN: [5, 13]
+    BD: [2, 14, 15, 16]
+- name: YA MAMA - A
+  section: Funk and Soul
+  page: 30
+  instruments:
+    CY: [5, 13]
+    BD: [1, 9]
+- name: YA MAMA - B
+  section: Funk and Soul
+  page: 30
+  instruments:
+    CY: [5, 13]
+    BD: [1, 8, 9]
+- name: COLD SWEAT - A
+  section: Funk and Soul
+  page: 31
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 8, 15]
+    BD: [1, 9, 11]
+- name: COLD SWEAT - B
+  section: Funk and Soul
+  page: 31
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 5, 8, 10, 13]
+    BD: [3, 9, 11, 15]
+- name: I GOT YOU (I FEEL GOOD) - A
+  section: Funk and Soul
+  page: 31
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 11]
+- name: I GOT YOU (I FEEL GOOD) - B
+  section: Funk and Soul
+  page: 31
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [3, 7, 11, 15]
+- name: THE SAME BLOOD
+  section: Funk and Soul
+  page: 32
+  instruments:
+    CY: [1, 3, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+    SN: [4, 6, 7, 13, 14, 15]
+    BD: [1, 2, 9, 10]
+- name: GROOVE ME
+  section: Funk and Soul
+  page: 32
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 4, 5, 8, 9, 10, 12, 14, 16]
+- name: LOOK-KA PY PY - A
+  section: Funk and Soul
+  page: 32
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 5, 8, 9, 11, 15]
+    BD: [1, 4, 6, 11, 14, 15]
+- name: LOOK-KA PY PY - B
+  section: Funk and Soul
+  page: 32
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 5, 6, 8, 9, 11, 15]
+    BD: [1, 4, 6, 8, 9, 11, 14, 15]
+- name: USE ME - A
+  section: Funk and Soul
+  page: 33
+  instruments:
+    CY: [1, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16]
+    SN: [3, 5, 7, 8, 10, 11, 13, 15, 16]
+    BD: [1, 5, 13]
+- name: USE ME - B
+  section: Funk and Soul
+  page: 33
+  instruments:
+    CY: [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16]
+    SN: [2, 3, 5, 7, 8, 10, 11, 13, 15, 16]
+    BD: [5, 8, 11, 13]
+- name: USE ME - C
+  section: Funk and Soul
+  page: 33
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    SN: [5, 8, 10, 13, 16]
+    BD: [1, 3, 6, 8, 9, 11, 12, 14, 16]
+- name: USE ME - D
+  section: Funk and Soul
+  page: 33
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16]
+    SN: [5, 8, 16]
+    BD: [1, 3, 6, 9, 10, 12, 14, 16]
+- name: FUNKY PRESIDENT
+  section: Funk and Soul
+  page: 34
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 4, 8, 10, 11]
+- name: GET UP - A
+  section: Funk and Soul
+  page: 34
+  instruments:
+    CY: [1, 3, 5, 7, 8, 9, 11, 13, 15, 16]
+    SN: [5, 7, 8, 10, 13, 16]
+    BD: [1, 11, 15]
+- name: GET UP - B
+  section: Funk and Soul
+  page: 34
+  instruments:
+    CY: [1, 3, 5, 7, 8, 9, 11, 13, 15]
+    SN: [5, 7, 8, 10, 13, 16]
+    BD: [1, 11, 15]
+- name: EXPENSIVE SHIT
+  section: Funk and Soul
+  page: 34
+  instruments:
+    CY: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+    SN: [1, 2, 4, 6, 9, 10, 13, 14]
+    BD: [4, 7, 15]
+- name: CHUG CHUG CHUG-A-LUG
+  section: Funk and Soul
+  page: 35
+  instruments:
+    CY: [1, 3, 5, 6, 7, 9, 10, 11, 13, 15]
+    SN: [2, 3, 5, 8, 10, 11, 13]
+    BD: [1, 4, 6, 8, 10, 12, 15]
+- name: THE FEZ - A
+  section: Funk and Soul
+  page: 35
+  instruments:
+    CY: [3, 7, 11, 15]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14, 16]
+    BD: [1, 9]
+- name: THE FEZ - B
+  section: Funk and Soul
+  page: 35
+  instruments:
+    CY: [3, 7, 11, 15]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14, 16]
+    BD: [1, 9, 12, 15]
+- name: ROCK STEADY
+  section: Funk and Soul
+  page: 35
+  instruments:
+    CY: [1, 3, 5, 7, 8, 9, 11, 13, 15, 16]
+    SN: [2, 5, 6, 8, 10, 13, 14, 16]
+    BD: [3, 5, 8, 11, 13]
+- name: SYNTHETIC SUBSTITUTION - A
+  section: Funk and Soul
+  page: 36
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 9]
+    BD: [1, 3, 8, 10, 11, 12, 16]
+- name: SYNTHETIC SUBSTITUTION - B
+  section: Funk and Soul
+  page: 36
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 9]
+    BD: [1, 3, 8, 10, 11, 12, 16]
+- name: "COW\u2019D BELL - A"
+  section: Funk and Soul
+  page: 36
+  instruments:
+    CB: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14, 16]
+    BD: [1, 4, 7, 8, 11, 12, 14, 16]
+- name: "COW\u2019D BELL - B"
+  section: Funk and Soul
+  page: 36
+  instruments:
+    CB: [1, 3, 4, 5, 7, 8, 9, 11, 12, 13, 15, 16]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14, 16]
+    BD: [1, 3, 4, 8, 9, 11, 12, 14, 16]
+- name: PALM GREASE - A
+  section: Funk and Soul
+  page: 37
+  instruments:
+    CY: [1, 2, 3, 4, 6, 7, 9, 11, 12, 14, 15]
+    SN: [5, 8, 10, 13, 16]
+    BD: [1, 9, 16]
+- name: PALM GREASE - B
+  section: Funk and Soul
+  page: 37
+  instruments:
+    CY: [1, 3, 11]
+    SN: [2, 6, 15]
+    BD: [3]
+- name: O-O-H CHILD - A
+  section: Funk and Soul
+  page: 37
+  instruments:
+    CY: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15]
+    SN: [2, 4, 5, 7, 8, 10, 12, 13, 14, 16]
+    BD: [1, 3, 9, 11, 12]
+- name: ^      ^      ^      ^
+  section: Funk and Soul
+  page: 37
+  instruments:
+    CY: [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15]
+    SN: [2, 4, 5, 7, 8, 10, 13, 15]
+    BD: [1, 3, 9, 11, 12]
+- name: LADY MARMALADE - A
+  section: Funk and Soul
+  page: 38
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 3, 7, 9, 15]
+- name: LADY MARMALADE - B
+  section: Funk and Soul
+  page: 38
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 9]
+    BD: [13]
+- name: HOT SWEAT - A
+  section: Funk and Soul
+  page: 38
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 8, 9, 10, 13, 15, 16]
+    BD: [1, 11]
+- name: HOT SWEAT - B
+  section: Funk and Soul
+  page: 38
+  instruments:
+    CY: [1, 3, 4, 5, 7, 9, 11, 12, 13, 15]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14]
+    BD: [3, 4, 11, 12, 15]
+- name: HAITIAN DIVORCE
+  section: Funk and Soul
+  page: 39
+  instruments:
+    CY: [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16]
+    SN: [2, 5, 7, 8, 10, 13, 15, 16]
+    BD: [3, 5, 11, 13]
+- name: COME DANCING - A
+  section: Funk and Soul
+  page: 39
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 3, 5, 6, 7, 10, 11, 13, 14, 15]
+    BD: [1, 8, 9, 16]
+- name: COME DANCING - B
+  section: Funk and Soul
+  page: 39
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 5, 6, 10, 13, 14, 15]
+    BD: [1, 3, 6, 8, 9, 16]
+- name: RESPECT YOURSELF - A
+  section: Funk and Soul
+  page: 40
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 11, 13]
+    BD: [1, 5, 9, 13]
+- name: RESPECT YOURSELF - B
+  section: Funk and Soul
+  page: 40
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 9, 11, 13]
+    BD: [1, 5, 9, 13]
+- name: EXPRESS YOURSELF - A
+  section: Funk and Soul
+  page: 40
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    SN: [5, 8, 10, 12, 14, 16]
+    BD: [1, 4, 9, 12, 15]
+- name: EXPRESS YOURSELF - B
+  section: Funk and Soul
+  page: 40
+  instruments:
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    SN: [5, 8, 10, 12, 13]
+    BD: [1, 4, 9, 12, 15]
+- name: LET A WOMAN BE A WOMAN
+  section: Funk and Soul
+  page: 41
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 8, 10, 11, 13, 14]
+    BD: [3, 9, 11, 12, 14, 15]
+- name: LET A MAN BE A MAN
+  section: Funk and Soul
+  page: 41
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 8, 10, 12, 13]
+    BD: [3, 11, 15]
+- name: BOOKS OF MOSES - A
+  section: Funk and Soul
+  page: 41
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 5, 9, 12]
+- name: BOOKS OF MOSES - B
+  section: Funk and Soul
+  page: 41
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [5, 13]
+    BD: [1, 5, 9]
+- name: MOTHER POPCORN - A
+  section: Funk and Soul
+  page: 42
+  instruments:
+    CY: [1, 5, 9, 13]
+    SN: [5, 8, 10, 15]
+    BD: [1, 3, 11]
+- name: MOTHER POPCORN - B
+  section: Funk and Soul
+  page: 42
+  instruments:
+    CY: [1, 5, 9, 13]
+    SN: [2, 4, 5, 6, 8, 10, 12, 13, 14, 16]
+    BD: [3, 7, 11, 15]
+- name: STRT BTS - A
+  section: Funk and Soul
+  page: 42
+  instruments:
+    CY: [2, 3, 5, 6, 8, 9, 14, 15]
+    SN: [2, 5, 8, 12, 13]
+    BD: [1, 4, 7, 11]
+- name: STRT BTS - B
+  section: Funk and Soul
+  page: 42
+  instruments:
+    CY: [2, 3, 5, 6, 8, 9, 14, 15]
+    SN: [2, 5, 8, 13]
+    BD: [1, 4, 7, 11]
+- name: "I GOT THE FEELIN\u2019 - A"
+  section: Funk and Soul
+  page: 43
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [7, 10, 15]
+    BD: [1, 3, 11]
+- name: "I GOT THE FEELIN\u2019 - B"
+  section: Funk and Soul
+  page: 43
+  instruments:
+    CY: [1, 3, 5, 7, 9, 11, 13, 15]
+    SN: [2, 5, 6, 8, 10, 11, 12, 14, 15, 16]
+    BD: [3, 9, 13, 15]
+- name: MORE BOUNCE TO THE OUNCE
+  section: Funk and Soul
+  page: 43
+  instruments:
+    CH: [3, 5, 7, 9, 11, 13, 15]
+    OH: [1]
+    HC: [5, 13]
+    SN: [5, 13]
+    BD: [1, 9, 10]
+- name: SON CLAVE
+  section: Afro-Cuban
+  page: 44
+  instruments:
+    BD: [1, 4, 5, 8, 9, 12, 13, 16]
+    RS: [1, 4, 7, 11, 13]
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+- name: RUMBA
+  section: Afro-Cuban
+  page: 44
+  instruments:
+    BD: [1, 4, 5, 8, 9, 12, 13, 16]
+    RS: [1, 4, 8, 11, 13]
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+- name: BOSSA NOVA
+  section: Afro-Cuban
+  page: 44
+  instruments:
+    BD: [1, 4, 5, 8, 9, 12, 13, 16]
+    RS: [1, 4, 7, 11, 14]
+    CY: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+- name: BOUTON
+  section: Afro-Cuban
+  page: 44
+  instruments:
+    BD: [1, 9, 11, 15]
+    RS: [4, 7, 13]
+    CH: [1, 3, 4, 5, 7, 9, 11, 13, 15]
+- name: GAHU
+  section: Afro-Cuban
+  page: 45
+  instruments:
+    BD: [1, 5, 9, 13, 15]
+    RS: [3, 4, 7, 8, 11, 12, 15, 16]
+    CB: [1, 4, 7, 11, 15]
+- name: SHIKO
+  section: Afro-Cuban
+  page: 45
+  instruments:
+    BD: [1, 5, 7, 9, 13, 15]
+    RS: [3, 4, 7, 8, 11, 12, 15, 16]
+    CB: [1, 5, 7, 11, 13]
+- name: SOUKOUS
+  section: Afro-Cuban
+  page: 45
+  instruments:
+    BD: [1, 5, 9, 13, 15]
+    RS: [1, 4, 7, 9, 12, 15]
+    CB: [1, 4, 7, 10, 11]
+- name: DRUM AND BASS 1 - A
+  section: Drum and Bass
+  page: 46
+  instruments:
+    BD: [1, 4, 8, 10, 11, 16]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: DRUM AND BASS 1 - B
+  section: Drum and Bass
+  page: 46
+  instruments:
+    BD: [1, 3, 8, 9, 10, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: DRUM AND BASS 2 - A
+  section: Drum and Bass
+  page: 46
+  instruments:
+    BD: [1, 8, 10, 12, 16]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: DRUM AND BASS 2 - B
+  section: Drum and Bass
+  page: 46
+  instruments:
+    BD: [1, 12]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15, 16]
+- name: DRUM AND BASS 3
+  section: Drum and Bass
+  page: 46
+  instruments:
+    BD: [1, 11]
+    SN: [5, 13]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [7, 8, 9, 10]
+- name: DRUM AND BASS 4 - A
+  section: Drum and Bass
+  page: 47
+  instruments:
+    BD: [1, 7]
+    SN: [5, 11, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    OH: [1]
+- name: DRUM AND BASS 4 - B
+  section: Drum and Bass
+  page: 47
+  instruments:
+    BD: [5, 11]
+    SN: [5, 13]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: JUNGLE - A
+  section: Drum and Bass
+  page: 47
+  instruments:
+    BD: [1, 3, 11]
+    SN: [5, 8, 10, 15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+    OH: [1]
+- name: JUNGLE - B
+  section: Drum and Bass
+  page: 47
+  instruments:
+    BD: [2, 3, 11]
+    SN: [2, 5, 8, 10, 15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: TECHNO
+  section: EDM
+  page: 48
+  instruments:
+    BD: [1, 5, 9, 13, 15]
+    SN: [5, 13]
+    CH: [10]
+    OH: [3, 7, 11, 15]
+- name: DUBSTEP - A
+  section: EDM
+  page: 48
+  instruments:
+    BD: [1, 11]
+    SN: [9]
+    CH: [2, 3, 7, 12, 15]
+    OH: [5, 14]
+- name: DUBSTEP - B
+  section: EDM
+  page: 48
+  instruments:
+    BD: [1, 4, 7, 11]
+    SN: [9]
+    CH: [2, 3, 7, 12, 15]
+    OH: [5, 14]
+- name: DUBSTEP - RATCHETED
+  section: EDM
+  page: 48
+  instruments:
+    BD: [1, 4, 9, 12]
+    SN: [5, 13, 16]
+    CH: [1, 2, 6, 7, 8, 9, 10, 12, 13, 14, 16]
+    OH: [7]
+- name: UK GARAGE - A
+  section: EDM
+  page: 49
+  instruments:
+    BD: [1, 11]
+    CL: [5, 13]
+    CH: [3, 4, 7, 11, 15, 16]
+    RS: [2, 8, 14]
+    MT: [6, 12]
+- name: UK GARAGE - B
+  section: EDM
+  page: 49
+  instruments:
+    BD: [1, 11]
+    CL: [5, 13]
+    CH: [3, 7, 11, 15]
+    RS: [8, 14]
+    MT: [6, 12]
+- name: SYNTH WAVE
+  section: EDM
+  page: 49
+  instruments:
+    BD: [1, 9]
+    SN: [5, 13]
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [14]
+- name: HALF DROP
+  section: Dub
+  page: 50
+  instruments:
+    BD: [1]
+    SN: [9]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: ONE DROP
+  section: Dub
+  page: 50
+  instruments:
+    BD: [9]
+    SN: [9]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: TWO DROP
+  section: Dub
+  page: 50
+  instruments:
+    BD: [1, 9]
+    SN: [9]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: STEPPERS
+  section: Dub
+  page: 50
+  instruments:
+    BD: [1, 5, 9, 13]
+    SN: [9]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: REGGAETON 1
+  section: Reggaeton
+  page: 51
+  instruments:
+    BD: [1, 5, 9, 13]
+    SN: [4, 7, 12, 15]
+    CH: [1, 3, 5, 7, 9, 11, 13, 15]
+- name: REGGAETON 2
+  section: Reggaeton
+  page: 51
+  instruments:
+    CH: [3, 7, 11, 15]
+    SN: [4, 6, 7, 8, 11, 12, 15]
+    BD: [1, 8]
+- name: REGGAETON 3 - A
+  section: Reggaeton
+  page: 51
+  instruments:
+    SN: [1, 4, 7, 9, 12, 15]
+    BD: [1, 9]
+- name: REGGAETON 3 - B
+  section: Reggaeton
+  page: 51
+  instruments:
+    CH: [1, 4, 7, 9, 12, 15]
+    SN: [1, 4, 7, 9, 12, 15]
+    BD: [1, 9]
+- name: POP 1 - A
+  section: Pop
+  page: 52
+  instruments:
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [1, 4, 7, 9, 10]
+    RS: [1, 2, 4, 7, 8, 11, 12]
+    SN: [5, 13]
+    BD: [1, 2, 4, 8, 11]
+    HC: [5, 13]
+- name: IN THE AIR LAST NIGHT - A
+  section: Pop
+  page: 52
+  instruments:
+    HT: [3, 7]
+    OH: [1, 13]
+    CH: [3, 7, 11, 13]
+    SN: [13]
+    BD: [11]
+- name: IN THE AIR LAST NIGHT - B
+  section: Pop
+  page: 52
+  instruments:
+    HT: [3, 7]
+    OH: [1, 13]
+    CH: [3, 7, 11, 13]
+    SN: [13]
+    BD: [1, 3, 5, 7, 9, 11, 15]
+- name: NINETEEN - A
+  section: Pop
+  page: 53
+  instruments:
+    CH: [1, 4, 7, 9, 10]
+    OH: [1, 4, 7, 9, 10]
+    RS: [1, 2, 4, 7, 8, 11, 12]
+    BD: [1, 2, 4, 8, 11]
+    HC: [5, 13]
+- name: NINETEEN - B
+  section: Pop
+  page: 53
+  instruments:
+    CH: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    OH: [1, 4, 7, 9, 10]
+    RS: [1, 2, 4, 7, 8, 11, 12]
+    SN: [5, 13]
+    BD: [1, 2, 4, 8, 11]
+    HC: [5, 13]
+- name: BLEU MONDAY - A
+  section: Pop
+  page: 53
+  instruments:
+    OH: [3, 7, 11, 15]
+    SN: [5, 13]
+    BD: [1, 9]
+    HC: [5, 13]
+- name: BLEU MONDAY - B
+  section: Pop
+  page: 53
+  instruments:
+    CH: [1, 4, 5, 8, 9, 12, 13, 16]
+    OH: [3, 7, 11, 15]
+    SN: [5, 13]
+    BD: [1, 9]
+    HC: [5, 13]
+- name: STANDARD BREAKBEAT 1
+  section: Breaks
+  page: 54
+  instruments:
+    BD: [1, 11]
+    SN: [5, 13]
+- name: STANDARD BREAKBEAT 2
+  section: Breaks
+  page: 54
+  instruments:
+    BD: [1, 3, 11]
+    SN: [5, 13]
+- name: STANDARD BREAKBEAT 3
+  section: Breaks
+  page: 54
+  instruments:
+    BD: [1, 3, 7, 11]
+    SN: [5, 8, 10, 13]
+- name: POLYRHYTHMIC - A
+  section: Breaks
+  page: 54
+  instruments:
+    BD: [1, 7]
+    SN: [3, 5, 9, 11, 12, 13, 15, 16]
+- name: POLYRHYTHMIC - B
+  section: Breaks
+  page: 54
+  instruments:
+    BD: [3, 9]
+    SN: [5, 7, 11, 13]
+- name: HYBRID KICK
+  section: Hybrid Breaks With Alternate Endings
+  page: 55
+  instruments:
+    BD: [1, 9]
+    SN: [5, 13]
+- name: "\u21B3 FOLLOW WITH HYBRID BREAK ENDING 1"
+  section: Hybrid Breaks With Alternate Endings
+  page: 55
+  instruments:
+    BD: [1, 11]
+    SN: [5, 10, 13]
+- name: "\u21B3 OR FOLLOW WITH HYBRID BREAK ENDING 2"
+  section: Hybrid Breaks With Alternate Endings
+  page: 55
+  instruments:
+    BD: [1, 7, 9, 12]
+    SN: [5, 13]
+- name: "\u21B3 OR FOLLOW WITH HYBRID BREAK ENDING 3"
+  section: Hybrid Breaks With Alternate Endings
+  page: 55
+  instruments:
+    BD: [1, 8, 11]
+    SN: [5, 13]
+- name: "\u21B3 OR FOLLOW WITH HYBRID BREAK ENDING 4"
+  section: Hybrid Breaks With Alternate Endings
+  page: 55
+  instruments:
+    BD: [1, 10]
+    SN: [5, 13]
+- name: "\u21B3 OR FOLLOW WITH HYBRID BREAK ENDING 5"
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 3, 9, 11]
+    SN: [5, 13]
+- name: "\u21B3 OR FOLLOW WITH HYBRID BREAK ENDING 6"
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 6, 8, 10, 11]
+    SN: [5, 13]
+- name: HYBRID KICK 7 - A
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 3, 9, 11]
+    SN: [5, 13]
+- name: "\u21B3 FOLLOW WITH HYBRID BREAK 7 - B"
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 2, 9, 11]
+    SN: [5, 13]
+- name: HYBRID 8 - A
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 9, 11]
+    SN: [5, 13]
+- name: "\u21B3 FOLLOW WITH HYBRID BREAK 8 - B"
+  section: Hybrid Breaks With Alternate Endings
+  page: 56
+  instruments:
+    BD: [1, 2, 9, 11]
+    SN: [5, 13]
+- name: IRREGULAR 1 - A
+  section: Irregular Breaks
+  page: 57
+  instruments:
+    BD: [1, 3, 4, 7, 11]
+    SN: [5, 8, 13, 16]
+- name: IRREGULAR 1 - B
+  section: Irregular Breaks
+  page: 57
+  instruments:
+    BD: [1, 3, 8, 11]
+    SN: [5, 13, 16]
+- name: IRREGULAR 2 - A
+  section: Irregular Breaks
+  page: 57
+  instruments:
+    BD: [1, 8, 11]
+    SN: [4, 13]
+- name: IRREGULAR 2 - B
+  section: Irregular Breaks
+  page: 57
+  instruments:
+    BD: [1, 3, 7, 11]
+    SN: [5, 9, 13]
+- name: IRREGULAR 3
+  section: Irregular Breaks
+  page: 57
+  instruments:
+    BD: [1, 4, 9, 15]
+    SN: [2, 5, 11, 14]
+- name: ROLLING 1
+  section: Rolling Breaks
+  page: 58
+  instruments:
+    BD: [1, 11]
+    SN: [5, 13]
+- name: ROLLING 2
+  section: Rolling Breaks
+  page: 58
+  instruments:
+    BD: [1, 11, 14]
+    SN: [5, 13]
+- name: ROLLING 3 - A
+  section: Rolling Breaks
+  page: 58
+  instruments:
+    BD: [1, 7, 13]
+    SN: [5, 11]
+- name: ROLLING 3 - B
+  section: Rolling Breaks
+  page: 58
+  instruments:
+    BD: [1, 7, 13]
+    SN: [5, 11, 15]
+- name: ROLLING 4 - A
+  section: Rolling Breaks
+  page: 58
+  instruments:
+    BD: [1, 2]
+    SN: [5, 13]
+- name: ROLLING 4 - B
+  section: Rolling Breaks
+  page: 59
+  instruments:
+    BD: [1, 8, 10, 11]
+    SN: [5, 13]
+- name: ROLLING 5 - A
+  section: Rolling Breaks
+  page: 59
+  instruments:
+    BD: [1, 3, 11]
+    SN: [5, 13]
+- name: ROLLING 5 - B
+  section: Rolling Breaks
+  page: 59
+  instruments:
+    BD: [1, 4, 11]
+    SN: [5, 13]
+- name: ROLLING 6 - A
+  section: Rolling Breaks
+  page: 59
+  instruments:
+    BD: [1, 7, 12]
+    SN: [5, 13]
+- name: ROLLING 6 - B
+  section: Rolling Breaks
+  page: 59
+  instruments:
+    BD: [1, 3, 8, 11, 14]
+    SN: [5, 13]
+- name: ROLLING 7 - A
+  section: Rolling Breaks
+  page: 60
+  instruments:
+    BD: [1, 8, 9, 12]
+    SN: [5, 13]
+- name: ROLLING 7 - B
+  section: Rolling Breaks
+  page: 60
+  instruments:
+    BD: [1, 4, 8, 11]
+    SN: [5, 13]
+- name: ROLLING 7 - C
+  section: Rolling Breaks
+  page: 60
+  instruments:
+    BD: [1, 8, 11]
+    SN: [5, 13]
+- name: ROLLING 7 - D
+  section: Rolling Breaks
+  page: 60
+  instruments:
+    BD: [1, 4, 8, 11]
+    SN: [5, 13]
+- name: ROLLING 8
+  section: Rolling Breaks
+  page: 60
+  instruments:
+    BD: [1, 8]
+    SN: [5, 13]
+- name: ROLLING 9 - A
+  section: Rolling Breaks
+  page: 61
+  instruments:
+    BD: [1, 9, 11]
+    SN: [5, 13]
+- name: ROLLING 9 - B
+  section: Rolling Breaks
+  page: 61
+  instruments:
+    BD: [1, 2, 9, 11]
+    SN: [5, 13]
+- name: ROLLING 10
+  section: Rolling Breaks
+  page: 61
+  instruments:
+    BD: [1, 8, 12]
+    SN: [5, 13]
+- name: ROLLING 11
+  section: Rolling Breaks
+  page: 61
+  instruments:
+    BD: [1, 6, 7, 10, 11]
+    SN: [5, 13]
+- name: CONTEMPORARY SNARE 1 - A
+  section: Breaks - Snare
+  page: 62
+  instruments:
+    BD: [1, 11]
+    SN: [5, 10, 15]
+- name: CONTEMPORARY SNARE 1 - B
+  section: Breaks - Snare
+  page: 62
+  instruments:
+    BD: [3, 11]
+    SN: [7, 10, 13]
+- name: CONTEMPORARY SNARE 2 - A
+  section: Breaks - Snare
+  page: 62
+  instruments:
+    BD: [1, 3, 11]
+    SN: [5, 13]
+- name: CONTEMPORARY SNARE 2 - B
+  section: Breaks - Snare
+  page: 62
+  instruments:
+    BD: [3, 11, 12]
+    SN: [5, 10, 13]
+- name: CONTEMPORARY SNARE 3 - A
+  section: Breaks - Snare
+  page: 63
+  instruments:
+    BD: [1, 7, 15]
+    SN: [5, 11, 14, 16]
+- name: CONTEMPORARY SNARE 3 - B
+  section: Breaks - Snare
+  page: 63
+  instruments:
+    BD: [1, 4, 7, 15]
+    SN: [5, 11]
+- name: UNCONVENTIONAL SNARE 1 - A
+  section: Breaks - Snare
+  page: 63
+  instruments:
+    BD: [1, 5, 11]
+    SN: [9, 15]
+- name: UNCONVENTIONAL SNARE 1 - B
+  section: Breaks - Snare
+  page: 63
+  instruments:
+    BD: [1, 7, 11]
+    SN: [5, 13]
+- name: UNCONVENTIONAL SNARE 2 - A
+  section: Breaks - Snare
+  page: 63
+  instruments:
+    BD: [1, 13]
+    SN: [5, 9, 12]
+- name: UNCONVENTIONAL SNARE 2 - B
+  section: Breaks - Snare
+  page: 64
+  instruments:
+    BD: [1, 5, 9, 11]
+    SN: [8, 13]
+- name: UNCONVENTIONAL SNARE 3 - A
+  section: Breaks - Snare
+  page: 64
+  instruments:
+    BD: [1, 7, 14]
+    SN: [5, 11]
+- name: UNCONVENTIONAL SNARE 3 - B
+  section: Breaks - Snare
+  page: 64
+  instruments:
+    BD: [1, 5, 9, 11]
+    SN: [8, 13]
+- name: UNCONVENTIONAL SNARE 4 - A
+  section: Breaks - Snare
+  page: 64
+  instruments:
+    BD: [1, 3, 7, 9]
+    SN: [5, 11]
+- name: UNCONVENTIONAL SNARE 4 - B
+  section: Breaks - Snare
+  page: 64
+  instruments:
+    BD: [3, 11]
+    SN: [1, 5, 10, 13]
+- name: GHOST SNARE 1 - A
+  section: Ghost Snares
+  page: 65
+  instruments:
+    SN: [5, 8, 10, 13, 16]
+- name: GHOST SNARE 1 - B
+  section: Ghost Snares
+  page: 65
+  instruments:
+    SN: [5, 8, 10, 13]
+- name: GHOST SNARE 2 - A
+  section: Ghost Snares
+  page: 65
+  instruments:
+    SN: [2, 5, 8, 13, 16]
+- name: GHOST SNARE 2 - B
+  section: Ghost Snares
+  page: 65
+  instruments:
+    SN: [2, 5, 10, 13, 16]
+- name: CONTEMPORARY KICK 1 - A
+  section: Breaks - Kick
+  page: 66
+  instruments:
+    BD: [1, 11]
+    SN: [5, 15]
+- name: CONTEMPORARY KICK 1 - B
+  section: Breaks - Kick
+  page: 66
+  instruments:
+    BD: [3, 8, 11]
+    SN: [5, 13]
+- name: CONTEMPORARY KICK 2 - A
+  section: Breaks - Kick
+  page: 66
+  instruments:
+    BD: [3, 8, 11]
+    SN: [5, 10, 13]
+- name: CONTEMPORARY KICK 2 - B
+  section: Breaks - Kick
+  page: 66
+  instruments:
+    BD: [3, 11, 14]
+    SN: [5, 13]
+- name: CONTEMPORARY KICK 3 - A
+  section: Breaks - Kick
+  page: 67
+  instruments:
+    BD: [1, 11]
+    SN: [5, 15]
+- name: CONTEMPORARY KICK 3 - B
+  section: Breaks - Kick
+  page: 67
+  instruments:
+    BD: [1, 9, 11]
+    SN: [5, 13]
+- name: CONTEMPORARY KICK 4
+  section: Breaks - Kick
+  page: 67
+  instruments:
+    BD: [1, 9]
+    SN: [5, 11]
+- name: DRUM ROLL 1
+  section: Drum Rolls
+  page: 68
+  instruments:
+    HT: [9, 10, 11]
+    MT: [12, 13, 14]
+    LT: [15, 16]
+    OH: [1]
+    CY: [1]
+- name: DRUM ROLL 2
+  section: Drum Rolls
+  page: 68
+  instruments:
+    BD: [13, 15]
+    SN: [1, 3, 4, 5, 7, 9, 10, 11, 12]
+- name: DRUM ROLL 3
+  section: Drum Rolls
+  page: 68
+  instruments:
+    SN: [1, 2, 3, 5, 6, 7, 9, 11, 13, 14, 15, 16]
+- name: DRUM ROLL 4
+  section: Drum Rolls
+  page: 68
+  instruments:
+    BD: [1, 7, 13]
+    SN: [4, 5, 8, 9, 16]
+    CY: [1, 7, 13]
+- name: DRUM ROLL 5
+  section: Drum Rolls
+  page: 69
+  instruments:
+    HT: [1]
+    MT: [5, 9, 11]
+    LT: [13, 15]
+- name: DRUM ROLL 6
+  section: Drum Rolls
+  page: 69
+  instruments:
+    HT: [1]
+    MT: [5, 9, 11]
+    LT: [13, 15]
+- name: DRUM ROLL 7
+  section: Drum Rolls
+  page: 69
+  instruments:
+    HT: [3]
+    MT: [4, 7, 8]
+    LT: [11, 12, 14]
+    SN: [1, 5, 9, 13]
+- name: DRUM ROLL 8
+  section: Drum Rolls
+  page: 70
+  instruments:
+    HT: [3]
+    MT: [5, 9, 11, 12]
+    LT: [15, 16]
+    SN: [1, 8, 13]
+- name: DRUM ROLL 9
+  section: Drum Rolls
+  page: 70
+  instruments:
+    HT: [3]
+    MT: [5, 11]
+    LT: [13, 15]
+    SN: [1, 2, 7, 9, 10]
+- name: DRUM ROLL 10
+  section: Drum Rolls
+  page: 70
+  instruments:
+    HT: [3, 4]
+    MT: [7, 8, 11, 12]
+    LT: [15, 16]
+    SN: [1, 2, 5, 6, 9, 10, 13, 14]
+- name: DRUM ROLL 11
+  section: Drum Rolls
+  page: 71
+  instruments:
+    HT: [2, 14]
+    MT: [5, 8]
+    LT: [11, 15, 16]
+    SN: [1, 4, 7, 10, 13]
+    BD: [3, 6, 9, 12]
+- name: DRUM ROLL 12
+  section: Drum Rolls
+  page: 71
+  instruments:
+    HT: [3, 10]
+    MT: [11, 13]
+    LT: [12, 14, 15]
+    SN: [1, 2, 9, 13]
+    BD: [5, 7]
+    CY: [5, 7]
+- name: DRUM ROLL 13
+  section: Drum Rolls
+  page: 71
+  instruments:
+    HT: [2]
+    MT: [6, 10]
+    LT: [14]
+    SN: [1, 5, 9, 13]
+    BD: [3, 4, 7, 8, 11, 12, 15, 16]
+- name: DRUM ROLL 14
+  section: Drum Rolls
+  page: 72
+  instruments:
+    HT: [10, 11, 12, 13]
+    MT: [4, 5, 6, 7, 8, 9, 14, 15]
+    LT: [1, 2, 3, 16]
+- name: DRUM ROLL 15
+  section: Drum Rolls
+  page: 72
+  instruments:
+    HT: [2, 10]
+    LT: [4, 8, 12, 16]
+    SN: [1, 5, 9, 13]
+- name: DRUM ROLL 16
+  section: Drum Rolls
+  page: 72
+  instruments:
+    SN: [1, 2, 7, 8, 13, 14]
+    BD: [3, 5, 11, 15]
+    CH: [3, 9, 15]
+    CY: [5, 11]
+- name: DRUM ROLL 17
+  section: Drum Rolls
+  page: 72
+  instruments:
+    HT: [3, 4]
+    MT: [9, 10]
+    SN: [1, 2, 5, 7, 8, 11, 13, 14, 15, 16]
+    CY: [5, 11]
+- name: DRUM ROLL 18
+  section: Drum Rolls
+  page: 73
+  instruments:
+    SN: [1, 7]
+    BD: [3, 5, 9, 11, 15]
+    CY: [1, 7, 13]
+- name: DRUM ROLL 19
+  section: Drum Rolls
+  page: 73
+  instruments:
+    SN: [1, 2, 7, 8, 13, 14]
+    BD: [3, 5, 9, 11, 15]
+    CY: [3, 5, 9, 11, 15]
+- name: DRUM ROLL 20
+  section: Drum Rolls
+  page: 73
+  instruments:
+    HT: [3, 5]
+    MT: [7, 15]
+    LT: [16]
+    SN: [1, 9, 11, 14]
+    BD: [2, 4, 6, 8, 10, 12, 13]
+    CY: [9]
+`;
 
+function parseYamlPatterns (yaml) {
+  var lines = (yaml || '').split(/\r?\n/)
+  var patterns = []
+  var current = null
+  var inPatterns = false
+  var inInstruments = false
+  var instrumentsIndent = 0
+  var patternIndent = 0
 
+  function trim (s) { return (s || '').trim() }
+
+  function parseNumberOrString (value) {
+    var num = Number(value)
+    return isNaN(num) ? value : num
+  }
+
+  function parseInlineMap (value) {
+    var body = trim(value)
+    if (body.charAt(0) !== '{' || body.charAt(body.length - 1) !== '}') return {}
+    body = body.slice(1, -1)
+    var result = {}
+    var pairs = body.split(',')
+    for (var i = 0; i < pairs.length; i++) {
+      var parts = pairs[i].split(':')
+      if (parts.length < 2) continue
+      var key = trim(parts.shift())
+      var val = trim(parts.join(':'))
+      result[key] = parseNumberOrString(val)
+    }
+    return result
+  }
+
+  function parseValue (value) {
+    var body = trim(value)
+    if (!body) return null
+    var first = body.charAt(0)
+    var last = body.charAt(body.length - 1)
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return body.slice(1, -1)
+    }
+    if (first === '[' && last === ']') {
+      var inner = body.slice(1, -1)
+      if (!inner.trim()) return []
+      var parts = inner.split(',')
+      var out = []
+      for (var i = 0; i < parts.length; i++) {
+        var v = trim(parts[i])
+        if (v) out.push(parseNumberOrString(v))
+      }
+      return out
+    }
+    if (first === '{' && last === '}') {
+      return parseInlineMap(body)
+    }
+    return parseNumberOrString(body)
+  }
+
+  function assignField (target, key, value) {
+    if (key === 'name' || key === 'n') target.n = value
+    else if (key === 'section' || key === 'sect') target.section = value
+    else if (key === 's') target.s = value
+    else if (key === 'instruments' || key === 'i') target.i = target.i || {}
+    else target[key] = value
+  }
+
+  function finalizePattern (raw, index) {
+    if (!raw) return null
+    var name = raw.n || raw.name || ('Pattern ' + (index + 1))
+    var sectionIndex = typeof raw.s === 'number' ? raw.s : DRUM_SECTIONS.indexOf(raw.section || '')
+    if (isNaN(sectionIndex) || sectionIndex < 0) {
+      sectionIndex = DRUM_SECTIONS.indexOf('Uncategorized')
+      if (sectionIndex < 0) sectionIndex = 0
+    }
+    var instruments = raw.i || raw.instruments || {}
+    return { s: sectionIndex, n: name, i: instruments }
+  }
+
+  for (var li = 0; li < lines.length; li++) {
+    var rawLine = lines[li]
+    var trimmed = trim(rawLine)
+    if (!trimmed || trimmed.charAt(0) === '#') continue
+    if (!inPatterns) {
+      if (trimmed === 'patterns:' || trimmed.indexOf('patterns:') === 0) {
+        inPatterns = true
+      }
+      continue
+    }
+    var indent = rawLine.match(/^\s*/)[0].length
+    if (trimmed.indexOf('- ') === 0) {
+      if (current) patterns.push(finalizePattern(current, patterns.length))
+      current = {}
+      inInstruments = false
+      instrumentsIndent = 0
+      patternIndent = indent
+      var rest = trimmed.slice(2)
+      if (rest.indexOf(':') !== -1) {
+        var parts = rest.split(':')
+        var key = trim(parts.shift())
+        var value = parts.join(':')
+        assignField(current, key, parseValue(value))
+      }
+      continue
+    }
+    if (!current) continue
+    if (trimmed.indexOf('instruments:') === 0) {
+      current.i = current.i || {}
+      inInstruments = true
+      instrumentsIndent = indent
+      continue
+    }
+    if (inInstruments && indent > instrumentsIndent) {
+      var instParts = trimmed.split(':')
+      var instKey = trim(instParts.shift())
+      var instVal = parseValue(instParts.join(':'))
+      current.i[instKey] = Array.isArray(instVal) ? instVal : []
+      continue
+    }
+    inInstruments = false
+    var fieldParts = trimmed.split(':')
+    if (fieldParts.length >= 2) {
+      assignField(current, trim(fieldParts.shift()), parseValue(fieldParts.join(':')))
+    }
+  }
+  if (current) patterns.push(finalizePattern(current, patterns.length))
+  return patterns
+}
+
+const DRUM_PATTERNS = (() => {
+  try {
+    var parsed = parseYamlPatterns(DRUM_PATTERNS_YAML)
+    if (parsed && parsed.length) return parsed
+  } catch (e) {
+    println('YAML parse failed, using empty pattern list: ' + e)
+  }
+  return []
+})()
+
+;[
+  {"s":23,"n":"TRIBAL GROOVE - A","i":{"BD":[1,7,11,15],"SN":[5,13],"CH":[1,3,5,7,9,11,13,15],"LT":[3,12],"MT":[8,16],"CB":[4,10]}},
+  {"s":23,"n":"TRIBAL GROOVE - B","i":{"BD":[1,7,11,15],"SN":[4,12],"CH":[1,3,7,11,15],"OH":[8],"LT":[3,14],"MT":[6,10],"CB":[12]}},
+  {"s":23,"n":"TRIBAL CLAVE","i":{"BD":[1,8,11,14],"SN":[4,12],"CH":[1,3,5,7,9,11,13,15],"CL":[3,7,11,15],"CB":[6,10,14],"OH":[12]}}
+].forEach(function (p) {
+  for (var i = 0; i < DRUM_PATTERNS.length; i++) {
+    if (DRUM_PATTERNS[i].n === p.n) return
+  }
+  DRUM_PATTERNS.push(p)
+})
 
 function init () {
   println('Drum Pattern ready!')
@@ -68,14 +2118,27 @@ function init () {
   })
 }
 
+function getPatternDisplayName (pattern) {
+  var sectionIndex = typeof pattern.s === 'number' ? pattern.s : Number.MAX_SAFE_INTEGER
+  var sectionName = DRUM_SECTIONS[sectionIndex] || 'Uncategorized'
+  return sectionName + ' - ' + pattern.n
+}
+
 function getPatternNames () {
-  return DRUM_PATTERNS.map(function (p) { return p.n }).sort()
+  return DRUM_PATTERNS.slice().sort(function (a, b) {
+    var sectionA = typeof a.s === 'number' ? a.s : Number.MAX_SAFE_INTEGER
+    var sectionB = typeof b.s === 'number' ? b.s : Number.MAX_SAFE_INTEGER
+    if (sectionA !== sectionB) {
+      return sectionA - sectionB
+    }
+    return a.n.localeCompare(b.n)
+  }).map(getPatternDisplayName)
 }
 
 function findPattern (name) {
   for (var i = 0; i < DRUM_PATTERNS.length; i++) {
     var p = DRUM_PATTERNS[i]
-    if (p.n === name) {
+    if (p.n === name || getPatternDisplayName(p) === name) {
       return p
     }
   }
@@ -128,3 +2191,6 @@ function flush () {}
 function exit () {
   println('-- Drum Pattern Bye! --')
 }
+
+
+

@@ -175,6 +175,20 @@ function init () {
     openUrlInBrowser(url)
   })
 
+  documentState.getSignalSetting('ChatGPT Generator', 'Text To Midi', 'Open ChatGPT Generator').addSignalObserver(() => {
+    const url = 'https://chatgpt.com/g/g-682e7b9f338881919be4abdc2900b752-chord-progression-generator'
+    println(`[AI Ideas] Opening ChatGPT Generator: ${url}`)
+    host.showPopupNotification('Opening ChatGPT chord progression generator')
+    openUrlInBrowser(url)
+  })
+
+  documentState.getSignalSetting('Google Gemini', 'Text To Midi', 'Open Google Gemini').addSignalObserver(() => {
+    const url = 'https://gemini.google.com/gem/1mEp9hCTbbA9UybeB3l8-ZQEkzQKC1TXh?usp=sharing'
+    println(`[AI Ideas] Opening Google Gemini: ${url}`)
+    host.showPopupNotification('Opening Google Gemini prompt helper')
+    openUrlInBrowser(url)
+  })
+
   // Helper: Try to open a URL in the system browser, with safe fallbacks
   function openUrlInBrowser (url) {
     try {
