@@ -1,4 +1,3 @@
-
 /*
  * Drum Pattern
  * controller script for Bitwig Studio
@@ -2145,9 +2144,34 @@ function findPattern (name) {
   return null
 }
 
+// small helper to keep notes in 0..127 and integer (same as RhythmGenerator)
+function clampNote(n) {
+  if (typeof n !== 'number') n = Number(n) || 0
+  n = Math.round(n)
+  if (n < 0) n = 0
+  if (n > 127) n = 127
+  return n
+}
+
+// small helper to keep velocity in 1..127 and integer
+function clampVelocity(v) {
+  if (typeof v !== 'number') v = Number(v) || 0
+  v = Math.round(v)
+  if (v < 1) v = 1
+  if (v > 127) v = 127
+  return v
+}
+
 function writePatternToClip (cursorClip, pattern, velocity, transpose) {
   var instruments = pattern.i || {}
   var longestStep = 0
+
+  // Clear existing steps (support different Bitwig APIs)
+  if (typeof cursorClip.clearSteps === 'function') {
+    cursorClip.clearSteps()
+  } else if (typeof cursorClip.clear === 'function') {
+    cursorClip.clear()
+  }
 
   for (var code in instruments) {
     if (!instruments.hasOwnProperty(code)) continue
@@ -2157,30 +2181,44 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
       continue
     }
     midiNote = midiNote + transpose
+
+    // Normalize into 0..127 range and clamp
     while (midiNote < 0) {
       midiNote += 12
     }
     while (midiNote > 127) {
       midiNote -= 12
     }
+    midiNote = clampNote(Math.round(midiNote))
+
     var steps = instruments[code]
     for (var i = 0; i < steps.length; i++) {
       var stepNumber = steps[i]
       var stepIndex = Math.max(0, stepNumber - 1)
-      var timeIn16ths = stepIndex
-      cursorClip.setStep(0, timeIn16ths, midiNote, velocity, STEP_LENGTH_BEATS)
+      // Repeat across 4 bars (16 steps per bar)
+      for (var bar = 0; bar < 4; bar++) {
+        var timeIn16ths = stepIndex + (bar * 16)
+        // ensure integer step index
+        timeIn16ths = Math.floor(timeIn16ths)
+        cursorClip.setStep(0, timeIn16ths, midiNote, clampVelocity(velocity), STEP_LENGTH_BEATS)
+      }
       if (stepNumber > longestStep) {
         longestStep = stepNumber
       }
     }
   }
 
-  var clipLengthInBeats = Math.max(4, longestStep * STEP_LENGTH_BEATS)
+  // Ensure minimum clip length is 16.0 beats (4 bars); allow longer if pattern needs it
+  var clipLengthInBeats = Math.max(16.0, longestStep * STEP_LENGTH_BEATS)
   try {
     if (typeof cursorClip.setLength === 'function') {
       cursorClip.setLength(clipLengthInBeats)
     } else if (cursorClip.getLength && typeof cursorClip.getLength().set === 'function') {
       cursorClip.getLength().set(clipLengthInBeats)
+    } else if (typeof cursorClip.setLoopLength === 'function') {
+      cursorClip.setLoopLength(clipLengthInBeats)
+    } else if (cursorClip.getLoopLength && typeof cursorClip.getLoopLength().set === 'function') {
+      cursorClip.getLoopLength().set(clipLengthInBeats)
     }
   } catch (e) {
     // Length APIs may vary across Bitwig versions; ignore if unavailable.

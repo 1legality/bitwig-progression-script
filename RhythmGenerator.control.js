@@ -1,13 +1,6 @@
 /*
- * Rhythm Generator v0.6 (Multi-Instrument Edition)
+ * Rhythm Generator v0.1
  * Controller script for Bitwig Studio
- *
- * NEW FEATURES:
- * - Instrument Selector: Hi-Hat, Shaker, Tom, Percussion, Ride
- * - Shaker Physics: Velocity oscillation (Push/Pull effect)
- * - Tom Logic: Sparse patterns with Flams
- * - Ride Logic: Bell accents on downbeats
- * - Percussion: Euclidean-style ear candy
  */
 
 loadAPI(17)
@@ -20,69 +13,116 @@ const TPQ = 96
 const TICKS_16TH = TPQ / 4 
 const BAR_TICKS = 4 * TPQ 
 
-const GENRES = ['Trap', 'Drill', 'Lofi', 'Boom Bap', 'House', 'Techno', 'Ambient']
-const INSTRUMENTS = ['Hi-Hat', 'Shaker', 'Tom', 'Percussion', 'Ride']
+const GENRES = ['Trap', 'Drill', 'Lofi', 'Boom Bap', 'House', 'Techno', 'Ambient', 'Tribal']
+const INSTRUMENTS = ['All', 'Kick', 'Snare', 'Hi-Hat', 'Shaker', 'Tom', 'Percussion', 'Ride', 'Bell']
 
-// --- Default MIDI Notes (Can be overridden by Drum Rack mapping) ---
+// --- TIMBRE GUIDE & DEFAULT NOTES ---
+// Use your VST mapping (kick/snare/hihat) and map tam/percussion to white keys in F1..C2
 const NOTES = {
-  'Hi-Hat': 42,
-  'Shaker': 70, // Maracas usually
-  'Tom': 47,    // Low-Mid Tom
-  'Percussion': 75, // Claves/Sticks
-  'Ride': 51
+  'Kick': 36,       // C1 (Kick)
+  'Snare': 38,      // D1 (Snare)
+  'Hi-Hat': 42,     // F#1 (Closed Hi-Hat)
+  'Shaker': 41,     // F1
+  'Tom': 43,        // G1
+  'Percussion': 45, // A1
+  'Ride': 47,       // B1
+  'Bell': 48        // C2
 }
 
-// --- TEMPLATES (The DNA) ---
-// x = Strong, . = Weak, o = Open/Alt, - = Rest, f = Flam
+// add a global octave offset (semitones). Negative = lower pitch.
+// Default -18 semitones = down 1.5 octaves (adjust as needed)
+const OCTAVE_OFFSET = -18
+
+// small helper to keep notes in 0..127 and integer
+function clampNote(n) {
+  if (typeof n !== 'number') n = Number(n) || 0
+  n = Math.round(n)
+  if (n < 0) n = 0
+  if (n > 127) n = 127
+  return n
+}
+
+// --- TEMPLATES (Abbreviated for readability, logic remains same) ---
 const TEMPLATES = {
+  'Kick': {
+    'Trap': ['x.........x.....', 'x...........x...', 'x..x......x.....', 'x.........x..x..', 'x.......x.x.....'],
+    'Drill': ['x.........x...x.', 'x...x.....x...x.', 'x.........x.x...', 'x.....x...x.....', 'x...x...x...x...'],
+    'Lofi': ['x.........x..x..', 'x...x.....x.....', 'x.........x.....', 'x.......x.......'],
+    'Boom Bap': ['x.........xx....', 'x..x......x.....', 'x.........x.x...', 'x.....x.x.......'],
+    'House': ['x...x...x...x...', 'x...x...x...x...', 'x..x.x..x..x.x..', 'x.......x...x...'],
+    'Techno': ['x...x...x...x...', 'x...x...x...x...', 'x..xx...x..xx...', 'x...x.x.x...x...'],
+    'Ambient': ['x...............', 'x.......x.......', '................'],
+    'Tribal': ['x..x..x.x..x..x.', 'x...x...x.x.x...', 'x.x...x.x...x...']
+  },
+  'Snare': {
+    'Trap': ['........x.......', '........x.......', '........x...x...', '........x.x.....'],
+    'Drill': ['......x.......x.', '......x.....x...', 'xxx...x.......x.', '......x...x...x.'],
+    'Lofi': ['....x.......x...', '....x.......x.x.', '....x.....x.x...', '....x.......x...'],
+    'Boom Bap': ['....x.......x...', '....x..x....x...', '....x.......x.x.'],
+    'House': ['....x.......x...', '....x.......x...', '....x.....x.x...', '..x.....x.......'],
+    'Techno': ['....x.......x...', '....x.......x...', '................'],
+    'Ambient': ['................', '....x.......x...', '................'],
+    'Tribal': ['..x...x...x...x.', 'x...x...x...x...', '..x..x..x..x....']
+  },
   'Hi-Hat': {
-    'Trap': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.xxx.x.', 'x...x...x...x...'],
-    'Drill': ['x..x..x.x..x..x.', 'x..x.x..x..x.x..'],
-    'Lofi': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.'],
-    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x-x-x-x-x-x-x-x-'],
-    'House': ['.o.o.o.o.o.o.o.o', 'x.o.x.o.x.o.x.o.'],
-    'Techno': ['x.x.x.x.x.x.x.x.', '.x.x.x.x.x.x.x.x'],
-    'Ambient': ['...x.......x....', 'x.......x.......']
+    'Trap': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.xxx.x.', 'x...x...x...x...', 'x.......x.......', 'x.x.x.x.x.......', 'x.x...x.x.x...x.'],
+    'Drill': ['x..x..x.x..x..x.', 'x..x.x..x..x.x..', 'x..x..x...x..x..', '.x..x..x.x..x..x', 'x...x...x..x..x.'],
+    'Lofi': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.', 'x.x...x.x.x.....', '....x.......x...', 'x-x-x-x-x-x-x-x-'],
+    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x-x-x-x-x-x-x-x-', 'x.x..x..x.x..x..', 'x...x.x.x...x.x.', 'x.......x.x.x...'],
+    'House': ['.o.o.o.o.o.o.o.o', 'x.o.x.o.x.o.x.o.', 'x...x...x...x...', '..x...x...x...x.', 'x.x.x.o.x.x.x.o.'],
+    'Techno': ['x.x.x.x.x.x.x.x.', '.x.x.x.x.x.x.x.x', 'xxxx.xxxxxxx.xxx', '..x...x...x...x.'],
+    'Ambient': ['...x.......x....', 'x.......x.......', '.......x.......x', '. . . . x . . . ', '................'],
+    'Tribal': ['x.x.x.x.x.x.x.x.', '.x.x.x.x.x.x.x.x', 'x.xx.x.x.xx.x.x.']
   },
   'Shaker': {
-    // Shakers are usually denser "motors"
-    'Trap': ['x.x.x.x.x.x.x.x.', 'x.xxx.xxx.xxx.xx'], 
-    'Drill': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.'], // Drill shakers often double the hats
-    'Lofi': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x...'], // Loose shake
-    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x-x-x-x-x-x-x-x-'],
-    'House': ['x.x.x.x.x.x.x.x.', '..x...x...x...x.'],
-    'Techno': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.'],
-    'Ambient': ['x.x.x.x.x.x.x.x.', '................'] // very soft background
+    'Trap': ['x.x.x.x.x.x.x.x.', 'x.xxx.xxx.xxx.xx', 'x...x...x...x...', '..x...x...x...x.'],
+    'Drill': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.', 'x..x..x..x..x..x', '......x.......x.'],
+    'Lofi': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x...', 'x...x...x...x...', '..x.x.x...x.x.x.'],
+    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x-x-x-x-x-x-x-x-', 'x..x..x..x..x..x'],
+    'House': ['x.x.x.x.x.x.x.x.', '..x...x...x...x.', 'x.x.x...x.x.x...', 'x...x.x.x...x.x.'],
+    'Techno': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', '.x.x.x.x.x.x.x.x'],
+    'Ambient': ['x.x.x.x.x.x.x.x.', '................', 'x.......x.......', '........x.......'],
+    'Tribal': ['x.x.x.x.x.x.x.x.', 'x.xx.x.xx.x.xx.x', 'x..x..x..x..x..x', 'x.x...x.x.x...x.']
   },
   'Tom': {
-    // Toms are sparse, mostly fills
-    'Trap': ['................', '..............xx', '............x.x.'],
-    'Drill': ['..............x.', '..........x..x..'],
-    'Lofi': ['................', '..............f.'],
-    'Boom Bap': ['................', '..............x.'],
-    'House': ['................', '..x.......x.....'], // Tribal hints
-    'Techno': ['................', '....x.......x...'], // Rumble hints
-    'Ambient': ['x...............', '..............x.']
+    'Trap': ['................', '..............xx', '............x.x.', 'x...............'],
+    'Drill': ['..............x.', '..........x..x..', '..x.............', 'x..x..x.........'],
+    'Lofi': ['................', '..............f.', '..........x.....'],
+    'Boom Bap': ['................', '..............x.', '..x.......x.....'],
+    'House': ['................', '..x.......x.....', '....x.......x...', '..x...x...x...x.'],
+    'Techno': ['................', '....x.......x...', '..x...x...x...x.', 'x...x...x...x...'],
+    'Ambient': ['x...............', '..............x.', '......x.........'],
+    'Tribal': ['x..x..x.x..x..x.', '..x...x.x...x...', 'x...x.x...x.x...', 'x.x...x.x.x...x.', '..x..x....x..x..']
   },
   'Percussion': {
-    // Syncopated ear candy
-    'Trap': ['..x...x...x...x.', '....x.......x...'],
-    'Drill': ['..x.....x.......', '......x...x.....'],
-    'Lofi': ['....x.......x...', '..x...x...x.....'],
-    'Boom Bap': ['..x...x.......x.', '....x...x.......'],
-    'House': ['..x...x...x...x.', '....x.......x...'],
-    'Techno': ['..x...x...x...x.', '....x.......x...'],
-    'Ambient': ['..x.............', '......x.......x.']
+    'Trap': ['..x...x...x...x.', '....x.......x...', 'x.......x.......', '......x...x.....'],
+    'Drill': ['..x.....x.......', '......x...x.....', '....x.......x...', 'x.....x.....x...'],
+    'Lofi': ['....x.......x...', '..x...x...x.....', '........x.......', 'x.x.............'],
+    'Boom Bap': ['..x...x.......x.', '....x...x.......', '..x.............'],
+    'House': ['..x...x...x...x.', '....x.......x...', 'x.....x.....x...', '...x.....x......'],
+    'Techno': ['..x...x...x...x.', '....x.......x...', 'x...x...x...x...', '......x.x.x.....'],
+    'Ambient': ['..x.............', '......x.......x.', 'x.......x.......', '....x.......x...'],
+    'Tribal': ['..x...x...x...x.', '....x..x....x..x', 'x.....x.......x.', 'x.x.x...x.x.x...']
   },
   'Ride': {
-    // Bells and Bows
-    'Trap': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.'],
-    'Drill': ['x...x...x...x...', 'x..x..x.x..x..x.'],
-    'Lofi': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.'],
-    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x...x.x.x...x.x.'], // The "Spang-a-lang" feel
-    'House': ['x...x...x...x...', '.x..x...x...x...'],
-    'Techno': ['x.x.x.x.x.x.x.x.', 'x...x...x...x...'],
-    'Ambient': ['x...............', 'x...x...x...x...']
+    'Trap': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.......x.......'],
+    'Drill': ['x...x...x...x...', 'x..x..x.x..x..x.', 'x.......x.......'],
+    'Lofi': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x..x..x..x..x..x'],
+    'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x...x.x.x...x.x.', 'x..x.x..x..x.x..', 'x...x...x..x.x..'],
+    'House': ['x...x...x...x...', '.x..x...x...x...', 'x.x.x.x.x.x.x.x.', 'x...x.x.x...x.x.'],
+    'Techno': ['x.x.x.x.x.x.x.x.', 'x...x...x...x...', '.x..x...x...x...'],
+    'Ambient': ['x...............', 'x...x...x...x...', 'x.......x.......'],
+    'Tribal': ['x...x...x...x...', 'x...x.x.x...x.x.', 'x.x...x.x.x...x.']
+  },
+  'Bell': {
+    'Trap': ['x...............', '............x...', '..x.......x.....'],
+    'Drill': ['..x.............', 'x.....x.....x...', '....x.......x...'],
+    'Lofi': ['..x.............', '......x.........'],
+    'Boom Bap': ['..x...x.......x.', '....x...x.......'],
+    'House': ['.x..x...x...x...', '..x...x...x...x.', 'x...x...x...x...'],
+    'Techno': ['.x..x...x...x...', '..x.......x.....', 'x...x...x...x...'],
+    'Ambient': ['................', '......x.........', '..............x.'],
+    'Tribal': ['x.x.x...x.x.x...', '..x...x...x...x.', 'x..x..x.x..x..x.']
   }
 }
 
@@ -93,21 +133,33 @@ const RULES = {
   'Boom Bap': { velStrong: 95, velWeak: 60, swing: 0.15, rollChance: 0.05, rollType: 'none' },
   'House': { velStrong: 100, velWeak: 50, swing: 0.05, rollChance: 0.1, rollType: 'burst' },
   'Techno': { velStrong: 100, velWeak: 85, swing: 0, rollChance: 0.05, rollType: 'none' },
-  'Ambient': { velStrong: 65, velWeak: 40, swing: 0, rollChance: 0.3, rollType: 'spray' }
+  'Ambient': { velStrong: 65, velWeak: 40, swing: 0, rollChance: 0.3, rollType: 'spray' },
+  'Tribal': { velStrong: 115, velWeak: 75, swing: 0.18, rollChance: 0.2, rollType: 'burst' }
 }
 
-// --- Controller State ---
-var sectionSetting, instrumentSetting, heatSetting
-var cursorClipLauncher
+var sectionSetting, instrumentSetting, heatSetting, densitySetting
+var cursorClipLauncher, cursorClipArranger
+var clipTypeSetting
+var transport
 
 function init () {
-  println('Rhythm Generator v0.6 Initialized')
+  println('Rhythm Generator v0.1 Initialized')
   const documentState = host.getDocumentState()
-  cursorClipLauncher = host.createCursorClip(128, 128)
+  transport = host.createTransport()
   
+  cursorClipLauncher = host.createLauncherCursorClip(16 * 128, 128)
+  cursorClipArranger = host.createArrangerCursorClip(16 * 128, 128)
+
+  // apply octave offset for the default clip scroll key
+  const defaultScrollKey = clampNote((NOTES['Kick'] || 36) + OCTAVE_OFFSET)
+  try { cursorClipLauncher.scrollToKey(defaultScrollKey) } catch (e) {}
+  try { cursorClipArranger.scrollToKey(defaultScrollKey) } catch (e) {}
+
   instrumentSetting = documentState.getEnumSetting('Instrument', 'Generator', INSTRUMENTS, INSTRUMENTS[0])
   sectionSetting = documentState.getEnumSetting('Genre', 'Generator', GENRES, GENRES[0])
-  heatSetting = documentState.getNumberSetting('Complexity', 'Generator', 0, 100, 1, '%', 40)
+  heatSetting = documentState.getEnumSetting('Complexity', 'Generator', ['Off', 'Low', 'Mid', 'High'], 'Off')
+  densitySetting = documentState.getEnumSetting('Density', 'Generator', ['Off', 'Low', 'Mid', 'High'], 'Off')
+  clipTypeSetting = documentState.getEnumSetting('Clip Type', 'Generator', ['Launcher', 'Arranger'], 'Launcher')
 
   documentState.getSignalSetting('Generate', 'Generator', 'FIRE').addSignalObserver(() => {
     generateAndWrite()
@@ -116,99 +168,162 @@ function init () {
 
 function generateAndWrite() {
   const genre = sectionSetting.get()
-  const inst = instrumentSetting.get()
-  const heat = heatSetting.getRaw() / 100
+  const instSelection = instrumentSetting.get()
   
+  const heatMap = { 'Off': 0.0, 'Low': 0.33, 'Mid': 0.66, 'High': 1.0 }
+  const heat = heatMap[heatSetting.get()]
+  const densityEnum = densitySetting.get()
+
+  let instrumentsToProcess = []
+  if (instSelection === 'All') {
+    instrumentsToProcess = Object.keys(NOTES)
+  } else {
+    instrumentsToProcess = [instSelection]
+  }
+
+  let combinedEvents = []
+  for (let i = 0; i < instrumentsToProcess.length; i++) {
+    const inst = instrumentsToProcess[i]
+    const instEvents = generatePatternForInstrument(inst, genre, heat, densityEnum)
+    combinedEvents = combinedEvents.concat(instEvents)
+  }
+
+  const clipChoice = (clipTypeSetting && clipTypeSetting.get && clipTypeSetting.get() === 'Arranger') ? cursorClipArranger : cursorClipLauncher
+  writeEventsToClip(clipChoice, combinedEvents)
+  
+  host.showPopupNotification('Generated: ' + instSelection + ' (' + genre + ')')
+}
+
+function generatePatternForInstrument(inst, genre, heat, densityEnum) {
   const rule = RULES[genre] || RULES['Trap']
-  // Safety fallback for templates
   const bank = TEMPLATES[inst] || TEMPLATES['Hi-Hat']
-  const templates = bank[genre] || bank['Trap']
+  const templates = bank[genre] || bank['Trap'] || bank[Object.keys(bank)[0]]
   
-  // Choose pattern
   const templateIdx = Math.floor(Math.random() * templates.length)
   const patternStr = templates[templateIdx]
   
+  // base note already adjusted by OCTAVE_OFFSET so all derived notes inherit the same shift
+  const baseNote = clampNote((NOTES[inst] || 36) + OCTAVE_OFFSET)
   let events = []
-  const baseNote = NOTES[inst]
-  
-  // --- 4 Bar Generation Loop ---
+
+  // 1. Generate Base Pattern (1 Bar / 16 steps)
+  // We determine what happens on each step of the grid first
+  let basePatternSteps = []
+  for (let i = 0; i < 16; i++) {
+     const char = patternStr[i]
+     if (char === '-') continue
+     if (char === '.' && heat === 0) continue
+
+     let keepNote = true
+     // Density Check
+     if (densityEnum !== 'Off') {
+         const isDownbeat = (i % 4 === 0)
+         const isBackbeat = (inst === 'Snare' && (i === 4 || i === 12))
+         const isImportant = isDownbeat || isBackbeat
+
+         if (densityEnum === 'High') { if (!isImportant && Math.random() < 0.1) keepNote = false }
+         else if (densityEnum === 'Mid') { if (!isImportant && Math.random() < 0.5) keepNote = false }
+         else if (densityEnum === 'Low') { if (!isImportant) keepNote = false }
+     }
+     if (inst === 'Kick' && i === 0 && densityEnum !== 'Low') keepNote = true
+     
+     if (keepNote) {
+        let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak 
+        let type = 'hit'
+        let note = baseNote
+
+        if (inst === 'Shaker') {
+           const subPos = i % 4
+           if (subPos === 0) vel = rule.velStrong
+           else if (subPos === 2) vel = rule.velStrong * 0.85
+           else vel = rule.velWeak
+        }
+        if (inst === 'Ride') {
+           vel = (vel > 100) ? 95 : vel
+           if (heat > 0) vel += Math.floor(Math.random() * 10 - 5)
+        }
+        if (inst === 'Bell') {
+           vel = 115 + (heat === 0 ? 0 : Math.floor(Math.random() * 12))
+           type = 'bell'
+        }
+        if (inst === 'Kick') {
+           vel = 120 + (heat === 0 ? 0 : Math.floor(Math.random() * 7))
+           if (char === '.') vel = 100 
+        }
+        if (inst === 'Snare') {
+           if (i % 4 === 0 || i === 4 || i === 12) vel = 125
+           else vel = 90 
+           if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
+        }
+
+        if (char === 'o') {
+           if (inst === 'Hi-Hat') note = 46 // override hi-hat open pitch
+           vel = rule.velStrong + 10
+           type = 'open'
+        } else if (char === 'f') {
+           type = 'flam'
+        } else if (char === '.') {
+          vel = Math.floor(vel * 0.7)
+        }
+
+        // apply octave offset to special-case overrides & clamp the final note
+        // if 'note' had been left as an override, apply the same shift as baseNote
+        if (typeof note === 'number') {
+          // if note was left as MIDI number (e.g., open hihat override), shift it same as base
+          if (note !== baseNote) {
+            note = clampNote(note + OCTAVE_OFFSET)
+          } else {
+            note = clampNote(note) // already includes baseNote shift
+          }
+        }
+
+        basePatternSteps.push({ i, vel, note, type })
+     }
+  }
+
+  // 2. Expand to 4 Bars (Loop)
   for (let bar = 0; bar < 4; bar++) {
     const isTurnaround = (bar === 3)
     
-    // Logic: Toms/Fills usually only happen on bar 4 or 2 & 4
-    if (inst === 'Tom' && !isTurnaround && Math.random() > (0.2 + heat)) {
-       // Skip non-turnaround bars for Toms unless Heat is high
-       continue 
+    // Tom Logic: Only play on turnaround OR random chaos
+    // Fix: If heat is 0 (Off), skip checks and allow pattern if it's meant to be there
+    if (inst === 'Tom' && genre !== 'Tribal' && !isTurnaround) {
+       // If Heat is ON, we might random skip. If Heat is OFF, we usually skip Toms unless Tribal
+       // Standard logic: Toms are fill instruments usually
+       if (heat > 0) {
+          if (Math.random() > (0.2 + heat)) continue
+       } else {
+          // Heat Off: Toms only on turnaround
+          continue 
+       }
     }
 
-    // Parse Template
-    for (let i = 0; i < 16; i++) {
-      const char = patternStr[i]
-      if (char === '-') continue
-      if (char === '.' && Math.random() > (0.6 + heat * 0.2)) continue // Skip ghosts if low heat
-
-      const tick = (bar * BAR_TICKS) + (i * 24)
-      let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak 
-      let type = 'hit'
-      let note = baseNote
-
-      // --- Instrument Specific Physics ---
-      
-      // 1. Shaker Physics (Sawtooth Velocity)
-      if (inst === 'Shaker') {
-         // Push/Pull effect: Accentuate the Downbeat and the "and"
-         // 1 e & a -> Strong, Weak, Med, Weak
-         const subPos = i % 4
-         if (subPos === 0) vel = rule.velStrong
-         else if (subPos === 2) vel = rule.velStrong * 0.85
-         else vel = rule.velWeak
-      }
-
-      // 2. Ride Physics (Bell vs Bow)
-      if (inst === 'Ride') {
-         // Quarter notes = Bell (High Vel), Others = Bow (Low Vel)
-         if (i % 4 === 0) {
-            vel = 110
-            type = 'bell' // Marker for logic, note doesn't change here typically
-         } else {
-            vel = 60
-         }
-      }
-
-      if (char === 'x') {
-        // Standard hit
-      } 
-      else if (char === 'o') {
-         // Open Hat or Alt Perc
-         if (inst === 'Hi-Hat') note = 46 
-         vel = rule.velStrong + 10
-         type = 'open'
-      }
-      else if (char === 'f') {
-         // Flam marker (handled in post-proc, but base note added here)
-         type = 'flam'
-      }
-
-      events.push({
-        time: tick,
-        duration: (inst === 'Shaker' || inst === 'Ride') ? 24 : 12, // Shakers need length for visual solidity
-        velocity: vel,
-        note: note,
-        type: type,
-        gridPos: i
-      })
+    // Apply base pattern to this bar
+    for (let s = 0; s < basePatternSteps.length; s++) {
+        const step = basePatternSteps[s]
+        // use TICKS_16TH instead of magic number 24
+        const tick = (bar * BAR_TICKS) + (step.i * TICKS_16TH)
+        
+        events.push({
+            time: tick,
+            duration: (inst === 'Shaker' || inst === 'Ride' || inst === 'Bell') ? TICKS_16TH : (TICKS_16TH / 2), 
+            velocity: step.vel,
+            note: step.note,
+            type: step.type,
+            gridPos: step.i,
+            instrument: inst,
+            genre: genre
+        })
     }
   }
   
-  // --- Post-Processing ---
-  events = applyInstrumentArticulations(events, inst, rule, heat)
-  events = applyGroove(events, rule, inst) // Moved groove logic here
-
-  writeEventsToClip(cursorClipLauncher, events)
-  host.showPopupNotification('Generated ' + inst + ' - ' + genre)
+  events = applyInstrumentArticulations(events, inst, rule, heat, genre)
+  events = applyGroove(events, rule, inst, heat, genre) 
+  
+  return events
 }
 
-function applyInstrumentArticulations(events, inst, rule, heat) {
+function applyInstrumentArticulations(events, inst, rule, heat, genre) {
   let out = []
   events.sort((a, b) => a.time - b.time)
 
@@ -216,125 +331,118 @@ function applyInstrumentArticulations(events, inst, rule, heat) {
     let ev = events[i]
     let processed = false
 
-    // --- Flam Logic (Toms / Percs) ---
-    if (ev.type === 'flam' || (inst === 'Tom' && Math.random() < heat * 0.3)) {
-       // Create a grace note before the main hit
-       out.push({
-          time: ev.time - 3, // 3 ticks before
-          duration: 3,
-          velocity: ev.velocity * 0.6,
-          note: ev.note,
-          type: 'grace'
-       })
-       out.push(ev)
-       processed = true
-    }
-
-    // --- Hat Rolls (Trap/Drill) ---
-    else if (inst === 'Hi-Hat') {
-       // Logic from HatGenerator v0.5.4
-      const isEndOfBeat = (ev.gridPos + 1) % 4 === 0
-      const isTurnaroundBar = ev.time >= (3 * BAR_TICKS)
-      
-      let rollProb = rule.rollChance * heat
-      if (isEndOfBeat) rollProb *= 1.5
-      if (isTurnaroundBar) rollProb *= 2.0
-      
-      if (ev.type !== 'open' && Math.random() < rollProb) {
-        if (rule.rollType === 'ratchet' || rule.rollType === 'slide') {
-          const subs = rule.rollResolution || [2, 3]
-          const div = subs[Math.floor(Math.random() * subs.length)]
-          const stepSize = 24 / div 
-          
-          const rampUp = Math.random() > 0.5
-          
-          for (let k = 0; k < div; k++) {
-            const t = ev.time + (k * stepSize)
-            let vScale = rampUp ? 0.6 + ((k / (div - 1)) * 0.4) : 1.0 - ((k / (div - 1)) * 0.4)
-            if (div === 1) vScale = 1.0 // Prevent division by zero if div is 1
-            
-            let pitchOffset = 0
-            if (rule.rollType === 'slide') {
-               pitchOffset = -1 * Math.floor((k / div) * 12) 
-            }
-            
-            out.push({
-              time: t,
-              duration: stepSize, 
-              velocity: ev.velocity * vScale,
-              note: ev.note + pitchOffset,
-              type: 'roll'
-            })
-          }
-          processed = true
-        }
-        else if (rule.rollType === 'drag') {
-          out.push({
-             time: ev.time - 4,
-             duration: 4,
-             velocity: ev.velocity * 0.4,
-             note: ev.note,
-             type: 'drag'
-          })
-          out.push(ev)
-          processed = true
-        }
-        else if (rule.rollType === 'spray') {
-          for (let k = 0; k < 5; k++) {
-             const offset = (Math.random() * 24) - 12
-             out.push({
-               time: ev.time + offset,
-               duration: 6,
-               velocity: Math.random() * 40 + 10,
-               note: ev.note,
-               type: 'spray'
-             })
-          }
-          processed = true
-        }
-      }
-    }
-    
-    // --- Shaker/Ambient "Spray" ---
-    else if (inst === 'Ambient' || (inst === 'Shaker' && Math.random() < 0.05)) {
-        // Granular spray
-        for (let k=0; k<4; k++) {
+    if (heat > 0) {
+        if (ev.type === 'flam' || (inst === 'Tom' && Math.random() < heat * 0.3)) {
            out.push({
-             time: ev.time + (Math.random()*10 - 5),
-             duration: 6,
-             velocity: ev.velocity * 0.5,
-             note: ev.note,
-             type: 'spray'
+              time: Math.max(0, ev.time - 3), 
+              duration: 3,
+              velocity: ev.velocity * 0.6,
+              note: clampNote(ev.note),
+              type: 'grace',
+              instrument: ev.instrument,
+              genre: ev.genre
            })
+           out.push(ev)
+           processed = true
         }
-        processed = true
+        else if (inst === 'Hi-Hat' || (inst === 'Snare' && (genre === 'Trap' || genre === 'Drill'))) {
+          const isEndOfBeat = (ev.gridPos + 1) % 4 === 0
+          const isTurnaroundBar = ev.time >= (3 * BAR_TICKS)
+          
+          let rollProb = rule.rollChance * heat
+          if (inst === 'Snare') rollProb *= 0.5 
+          if (isEndOfBeat) rollProb *= 1.5
+          if (isTurnaroundBar) rollProb *= 2.0
+          
+          if (ev.type !== 'open' && Math.random() < rollProb) {
+            if (rule.rollType === 'ratchet' || rule.rollType === 'slide' || rule.rollType === 'burst') {
+              let subs = rule.rollResolution || [2, 3]
+              if (rule.rollType === 'burst') subs = [4, 6]
+              
+              const div = subs[Math.floor(Math.random() * subs.length)]
+              const stepSize = 24 / div 
+              const rampUp = Math.random() > 0.5
+              
+              for (let k = 0; k < div; k++) {
+                const t = ev.time + (k * stepSize)
+                let vScale = rampUp ? 0.6 + ((k / (div - 1)) * 0.4) : 1.0 - ((k / (div - 1)) * 0.4)
+                if (div === 1) vScale = 1.0 
+                
+                let pitchOffset = 0
+                if (rule.rollType === 'slide') pitchOffset = -1 * Math.floor((k / div) * 12) 
+                
+                out.push({
+                  time: t,
+                  duration: stepSize, 
+                  velocity: ev.velocity * vScale,
+                  note: clampNote(ev.note + pitchOffset),
+                  type: 'roll',
+                  instrument: ev.instrument,
+                  genre: ev.genre
+                })
+              }
+              processed = true
+            }
+             else if (rule.rollType === 'drag') {
+                out.push({
+                   time: ev.time - 4,
+                   duration: 4,
+                   velocity: ev.velocity * 0.4,
+                   note: clampNote(ev.note),
+                   type: 'drag',
+                   instrument: ev.instrument,
+                   genre: ev.genre
+                })
+                out.push(ev)
+                processed = true
+             }
+          }
+        }
+        else if (genre === 'Ambient' || (inst === 'Shaker' && Math.random() < 0.05)) {
+            for (let k=0; k<4; k++) {
+               out.push({
+                 time: ev.time + (Math.random()*10 - 5),
+                 duration: 6,
+                 velocity: ev.velocity * 0.5,
+                 note: clampNote(ev.note), // clamp note here
+                 type: 'spray',
+                 instrument: ev.instrument,
+                 genre: ev.genre
+               })
+            }
+            processed = true
+        }
     }
-
     if (!processed) out.push(ev)
   }
   return out
 }
 
-function applyGroove(events, rule, inst) {
+function applyGroove(events, rule, heat) {
   return events.map(ev => {
-    // 1. Swing
-    const isOffbeat = (Math.floor(ev.time / 24) % 2 !== 0)
-    if (isOffbeat) {
-      ev.time += (rule.swing * 16)
-    }
-    
-    // 2. Jitter (Instrument Dependent)
-    // Shakers are messy. Hats are tight.
-    let jitterAmount = 2
-    if (inst === 'Shaker') jitterAmount = 4
-    if (inst === 'Percussion') jitterAmount = 5 // Sloppy/Funky
-    if (inst === 'Techno' && inst === 'Hi-Hat') jitterAmount = 0 // Robotic
+    // 1. Swing & 2. Jitter only apply if Heat > 0
+    if (heat > 0) {
+      // use TICKS_16TH here
+      const isOffbeat = (Math.floor(ev.time / TICKS_16TH) % 2 !== 0)
+      if (isOffbeat) {
+        ev.time += (rule.swing * TICKS_16TH)  // scale swing to ticks per 16th
+      }
+      
+      let jitterAmount = 2
+      if (ev.instrument === 'Shaker') jitterAmount = 4
+      if (ev.instrument === 'Percussion') jitterAmount = 5 
+      if (ev.genre === 'Techno' && ev.instrument === 'Kick') jitterAmount = 0 
+      if (ev.genre === 'Techno' && ev.instrument === 'Hi-Hat') jitterAmount = 1 
+      
+      jitterAmount = jitterAmount * heat
 
-    ev.time += (Math.random() * jitterAmount * 2) - jitterAmount
-    
+      ev.time += (Math.random() * jitterAmount * 2) - jitterAmount
+    }
+
     // 3. Clamp
     if (ev.velocity > 127) ev.velocity = 127
     if (ev.velocity < 1) ev.velocity = 1
+    ev.note = clampNote(ev.note) // ensure final note is clamped
     
     return ev
   })
@@ -355,14 +463,16 @@ function writeEventsToClip(clip, events) {
       clip.setLength(16.0)
     }
   } catch (e) {
-    // Length APIs vary between Bitwig versions; ignore if unavailable.
   }
   for (let i = 0; i < events.length; i++) {
     let ev = events[i]
     if (ev.time < 0) continue
     const step = ev.time / TICKS_16TH
     const dur = ev.duration / TPQ
-    clip.setStep(0, step, ev.note, ev.velocity, dur)
+
+    // ensure note is a clamped integer and usable by the clip API
+    const midiNote = clampNote(ev.note)
+    clip.setStep(0, step, midiNote, ev.velocity, dur)
   }
 }
 
