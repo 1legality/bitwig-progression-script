@@ -26,7 +26,10 @@ const GENRES = [
   'Trap (140)',
   'Tribal (125)'
 ]
-const INSTRUMENTS = ['All', 'Kick', 'Snare', 'Hi-Hat', 'Shaker', 'Tom', 'Percussion', 'Ride', 'Bell']
+const INSTRUMENTS = (() => {
+  const rest = ['Bass', 'Bell', 'Hi-Hat', 'Kick', 'Percussion', 'Ride', 'Shaker', 'Snare', 'Tom'].sort()
+  return ['All'].concat(rest)
+})()
 
 // --- TIMBRE GUIDE & DEFAULT NOTES ---
 const NOTES = {
@@ -37,7 +40,8 @@ const NOTES = {
   'Tom': 25,        
   'Percussion': 27, 
   'Ride': 29,       
-  'Bell': 30        
+  'Bell': 30,
+  'Bass': 36       // C2 anchor for simple bass ostinatos
 }
 
 const OCTAVE_OFFSET = 0
@@ -64,6 +68,48 @@ const TEMPLATES = {
     'Tribal': ['x.....x.....x...', 'x...x...x.x.....', 'x..x..x.....x...'],
     'Amen Brother': ['x.x.......xx....', 'x.........xx..x.', '..x.......xx....', 'x.x.......x.....'],
     'Synthwave': ['x...x...x...x...', 'x...x...x..x.x..', 'x...x.....x.x...', 'x.......x...x...'] // Driving 4/4 with slight variations
+  },
+  'Bass': {
+    'Trap': [
+      'x...x...x...x...', 'x.......x.......', 'x...x.x...x.x...', 'x...x...x..x.x..',
+      'x.......x...x...', 'x...x...xx..x...', 'x..x...x..x...x.', 'x...x..x...x...x'
+    ],
+    'Drill': [
+      'x...x...x...x...', 'x...x...x...x.x.', 'x...x.x...x...x.',
+      'x...x...x..x...x', 'x...x.x..x...x..', 'x...x...xx...x..'
+    ],
+    'Lofi': [
+      'x.......x.......', 'x...x.......x...', 'x...x...x.......',
+      'x.......x...x...', 'x...x...x..x....', 'x...x........x..'
+    ],
+    'Boom Bap': [
+      'x...x.......x...', 'x...x...x...x...', 'x...x.......x.x.',
+      'x...x..x....x...', 'x...x...x.x.....', 'x..x....x...x...'
+    ],
+    'House': [
+      'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x.x.',
+      'x...x...x..x.x..', 'x..x..x..x..x..x', 'x...x...xx...x..'
+    ],
+    'Techno': [
+      'x...x...x...x...', 'x...x...x...x...', 'x...x...x..xx...',
+      'x..x..x..x..x..x', 'x...x.x.x...x...', 'x...x...xx..x...'
+    ],
+    'Ambient': [
+      'x...............', 'x.......x.......', 'x...........x...',
+      'x.......x...x...', 'x...x...........', 'x.......x.....x.'
+    ],
+    'Tribal': [
+      'x...x...x...x...', 'x...x.x...x.x...', 'x...x...x...x.x.',
+      'x..x...x...x...x', 'x...x...xx...x..', 'x..x..x..x..x..x'
+    ],
+    'Amen Brother': [
+      'x...x...x...x...', 'x...x...x...x.x.', 'x...x...x.x...x.',
+      'x...x..x...x...x', 'x..x...x..x...x.', 'x...x.x...x...x.'
+    ],
+    'Synthwave': [
+      'x...x...x...x...', 'x...x...x...x.x.', 'x...x...x..x.x..',
+      'x...x...xx..x...', 'x..x...x..x...x.', 'x...x...x...xx..'
+    ]
   },
   'Snare': {
     'Trap': ['........x.......', '........x.......', '........x...x...', '........x.x.....'],
@@ -257,6 +303,13 @@ function selectEnsemble(genre) {
   else {
     active.push(texture)
     if (secondTexture) active.push(secondTexture)
+  }
+
+  // 6. Low anchor (Bass) for groove-based genres
+  if (genre !== 'Ambient' && genre !== 'Techno') {
+    if (Math.random() > 0.35) active.push('Bass')
+  } else if (genre === 'Techno' && Math.random() > 0.65) {
+    active.push('Bass')
   }
 
   return active
