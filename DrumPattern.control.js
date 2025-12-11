@@ -2494,7 +2494,7 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
 
   for (var ev = 0; ev < events.length; ev++) {
     var evt = events[ev]
-    cursorClip.setStep(0, evt.t, evt.note, evt.vel, STEP_LENGTH_BEATS)
+    cursorClip.setStep(0, parseInt(evt.t, 10), evt.note, evt.vel, STEP_LENGTH_BEATS)
   }
 
   var longest = events.reduce(function (max, e) {

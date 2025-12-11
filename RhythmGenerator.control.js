@@ -590,7 +590,7 @@ function writeEventsToClip(clip, events) {
     const dur = ev.duration / TPQ
 
     const midiNote = clampNote(ev.note)
-    clip.setStep(0, step, midiNote, ev.velocity, dur)
+    clip.setStep(0, parseInt(step, 10), midiNote, ev.velocity, dur)
   }
 }
 
