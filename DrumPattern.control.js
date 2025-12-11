@@ -2,12 +2,12 @@
  * Drum Pattern
  * controller script for Bitwig Studio
  * Converts stored drum patterns into MIDI (GM drum map)
- * @version 0.1
+ * @version 0.2
  */
 loadAPI(17)
 
 host.setShouldFailOnDeprecatedUse(true)
-host.defineController('1legality', 'Drum Pattern', '0.1', '5f9c773d-8d93-4d72-a27f-f583efad6b1f', '1legality')
+host.defineController('1legality', 'Drum Pattern', '0.2', '5f9c773d-8d93-4d72-a27f-f583efad6b1f', '1legality')
 
 const STEP_LENGTH_BEATS = 0.25
 const DEFAULT_VELOCITY = 110
@@ -59,13 +59,15 @@ const DRUM_SECTION_LABELS = {
   "Tribal": "Tribal (115-125 BPM)"
 }
 // Templates keyed by GM_DRUM_MAP codes (BD, SN, CH, OH, etc.)
+// 'x' = Normal hit
+// 'g' = Ghost note (quieter)
 const DRUM_PATTERN_TEMPLATES = {
   "EXAMPLE PATTERN": {
     "section": "Uncategorized",
     "instruments": {
       "BD": "x.......x.......",
       "SN": "....x.......x...",
-      "CH": "x.x.x.x.x.x.x.x."
+      "CH": "xgxgxgxgxgxgxgxg"
     }
   },
   "ONE AND SEVEN & FIVE AND THIRTEEN": {
@@ -75,7 +77,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "SN": "....x.......x..."
     }
   },
-  "BOOTS N\u2019 CATS": {
+  "BOOTS N’ CATS": {
     "section": "Basic Patterns",
     "instruments": {
       "BD": "x.......x.......",
@@ -108,8 +110,8 @@ const DRUM_PATTERN_TEMPLATES = {
   "STANDARD BREAK 1": {
     "section": "Standard Breaks",
     "instruments": {
-      "BD": "x.........x.....",
-      "SN": "....x.......x...",
+      "BD": "x.........x..g..",
+      "SN": "....x..g....x...",
       "CH": "x.x.x.x.xxx.x.x."
     }
   },
@@ -117,7 +119,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Standard Breaks",
     "instruments": {
       "BD": "x.........x.....",
-      "SN": "....x.......x...",
+      "SN": "....x..g....x...",
       "CH": "x.x.x.xxx.x...x."
     }
   },
@@ -125,7 +127,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Standard Breaks",
     "instruments": {
       "BD": "x......x..x.....",
-      "SN": "....x.......x...",
+      "SN": "....x..g....x...",
       "CH": "x.x.x.x.x.x.x.x."
     }
   },
@@ -225,7 +227,7 @@ const DRUM_PATTERN_TEMPLATES = {
   "SIBERIAN NIGHTS": {
     "section": "Electro",
     "instruments": {
-      "CH": "x.xxx.xxx.xxx.xx",
+      "CH": "xgxgxgxgxgxgxgxg",
       "SN": "....x.......x...",
       "BD": "x.....x........."
     }
@@ -235,7 +237,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x.....x.xx......",
       "SN": "....x.......x...",
-      "CH": "xxxxxxxxxxxxxxxx",
+      "CH": "xgxgxgxgxgxgxgxg",
       "OH": "..x.............",
       "SH": "....x.......x..."
     }
@@ -254,7 +256,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x...x...x...x...",
       "SN": "....x.......x...",
-      "CH": "xxxxxxxxxxxxxxxx",
+      "CH": "xgxgxgxgxgxgxgxg",
       "OH": "..x..x....x..x.."
     }
   },
@@ -274,7 +276,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "BD": "x...x...x...x...",
       "CL": "....x.......x...",
       "SH": "xxx.x.xxxxx.x.xx",
-      "CH": "xxxxxxxxxxxxxxxx",
+      "CH": "xgxgxgxgxgxgxgxg",
       "OH": ".x.x.x.x.x.x.x.x"
     }
   },
@@ -312,7 +314,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x...x...x...x...",
       "CL": "....x.......x...",
-      "SH": "xxxxxxxxxxxxxxxx",
+      "SH": "xgxgxgxgxgxgxgxg",
       "CH": "x...x...x...x...",
       "OH": "..xx..xx.xx.x..."
     }
@@ -340,7 +342,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x.....x.........",
       "SN": "....x.......x...",
-      "CH": "x.xxx.xxx.xxx.xx"
+      "CH": "x.xgx.xgx.xgx.xg"
     }
   },
   "MIAMI BASS - B": {
@@ -348,7 +350,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x.....x...x..x..",
       "SN": "....x.......x...",
-      "CH": "x.xxx.xxx.xxx.xx"
+      "CH": "x.xgx.xgx.xgx.xg"
     }
   },
   "SALLY": {
@@ -365,7 +367,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x..x..x.........",
       "SN": "....x.......x...",
-      "CH": "x.xxx.xxx.xxxxxx"
+      "CH": "x.xgx.xgx.xgxgxg"
     }
   },
   "HIP HOP 1 - A": {
@@ -475,7 +477,7 @@ const DRUM_PATTERN_TEMPLATES = {
   "PLANET ROCK - A": {
     "section": "Hip Hop",
     "instruments": {
-      "CH": "x.xxx.xxx.xxxxxx",
+      "CH": "x.xgx.xgx.xgxgxg",
       "CB": "x.x.x.xx.x.xx.x.",
       "SN": "....x.......x...",
       "BD": "x.....x.........",
@@ -485,7 +487,7 @@ const DRUM_PATTERN_TEMPLATES = {
   "PLANET ROCK - B": {
     "section": "Hip Hop",
     "instruments": {
-      "CH": "x.xxx.xxx.xxxxxx",
+      "CH": "x.xgx.xgx.xgxgxg",
       "CB": "x.x.x.xx.x.xx.x.",
       "SN": "....x.......x...",
       "BD": "x.....x...x..x..",
@@ -566,7 +568,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "CB": "........x.......",
       "OH": "..............x.",
-      "CH": "xxxxxxxxxxxxxxxx",
+      "CH": "xgxgxgxgxgxgxgxg",
       "CL": "..x...x...x...x.",
       "SN": "..x...x...x...x.",
       "BD": "x.x..x...x...x.."
@@ -596,7 +598,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x.......xx....",
-      "SN": "....x..x.x..x..x",
+      "SN": "....x..g.g..x..x",
       "CH": "x.x.x.x.x.x.x.x."
     }
   },
@@ -604,7 +606,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x.......xx....",
-      "SN": ".......x.x..x..x",
+      "SN": ".......g.g..x..x",
       "CH": "x.x.x.x.x.x.x.x.",
       "RS": "....x..........."
     }
@@ -613,7 +615,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x.......x.....",
-      "SN": ".......x.x..x..x",
+      "SN": ".......g.g..x..x",
       "CH": "x.x.x.x.x.x.x.x.",
       "RS": "..............x."
     }
@@ -622,7 +624,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x.......x.....",
-      "SN": ".x..x..x.x....x.",
+      "SN": ".x..x..g.g....x.",
       "CH": "x.x.x.x.x...x.x.",
       "CY": "..........x....."
     }
@@ -631,8 +633,8 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x...x...x..x..",
-      "SN": "....x..x.x.xx..x",
-      "CH": "xxxxxxx.xxxxx.xx",
+      "SN": "....x..g.g.gx..x",
+      "CH": "xgxgxgx.xgxgx.xg",
       "OH": ".......x.....x.."
     }
   },
@@ -641,7 +643,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x......xx.....x.",
       "SN": "....x.......x...",
-      "CH": "x.x.x.xxx...x.x.",
+      "CH": "x.x.x.xgx...x.x.",
       "OH": "..........x....."
     }
   },
@@ -653,7 +655,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "CH": "x.x.x.x.x.x.x.x."
     }
   },
-  "IT\u2019S A NEW DAY": {
+  "IT’S A NEW DAY": {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x.......xx...x",
@@ -669,7 +671,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "CH": "....x.......x..."
     }
   },
-  "ASHLEY\u2019S ROACHCLIP": {
+  "ASHLEY’S ROACHCLIP": {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x...x.xx......",
@@ -693,7 +695,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "BD": "x...x...x...x...",
       "SN": "....x.......x...",
-      "CH": "x.x.x.xxxxx.x.xx"
+      "CH": "x.x.x.xgxgx.x.xx"
     }
   },
   "CISSY STRUT - A": {
@@ -731,7 +733,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "BD": "x.x......x...xx.",
-      "SN": "....x.xx..x.x...",
+      "SN": "....x.gx..x.x...",
       "CY": "x.xx.x..xx.x..x."
     }
   },
@@ -762,31 +764,31 @@ const DRUM_PATTERN_TEMPLATES = {
   "KISSING MY LOVE - A": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxx.",
-      "SN": "....x..x.x..x...",
+      "CY": "xgxgxgxgxgxgxgx.",
+      "SN": "....x..g.g..x...",
       "BD": "xx.x.......x..x."
     }
   },
   "KISSING MY LOVE - B": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxxx",
-      "SN": "....x..x.x..x..x",
+      "CY": "xgxgxgxgxgxgxgxg",
+      "SN": "....x..g.g..x..x",
       "BD": "xx.x.......x.x.."
     }
   },
   "KISSING MY LOVE - C": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxxx",
-      "SN": "....x..x.x.....x",
+      "CY": "xgxgxgxgxgxgxgxg",
+      "SN": "....x..g.g.....x",
       "BD": "xx.x......x.xx.."
     }
   },
   "KISSING MY LOVE - D": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxx.",
+      "CY": "xgxgxgxgxgxgxgx.",
       "SN": "....x....x..x...",
       "BD": "x..x.......x..x."
     }
@@ -794,7 +796,7 @@ const DRUM_PATTERN_TEMPLATES = {
   "KISSING MY LOVE - E": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxx.",
+      "CY": "xgxgxgxgxgxgxgx.",
       "SN": "....x..x.x..x...",
       "BD": "x..........x.x.."
     }
@@ -873,7 +875,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
-      "SN": "....x..x......x.",
+      "SN": "....x..g......x.",
       "BD": "x.......x.x....."
     }
   },
@@ -881,7 +883,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
-      "SN": ".x..x..x.x..x...",
+      "SN": ".x..x..g.g..x...",
       "BD": "..x.....x.x...x."
     }
   },
@@ -970,7 +972,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
       "SN": "....x.......x...",
-      "BD": "x..x...x.xx....."
+      "BD": "x..x...x.x....."
     }
   },
   "GET UP - A": {
@@ -1045,7 +1047,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "BD": "x.x....x.xxx...x"
     }
   },
-  "COW\u2019D BELL - A": {
+  "COW’D BELL - A": {
     "section": "Funk and Soul",
     "instruments": {
       "CB": "x.xxx.xxx.xxx.xx",
@@ -1053,7 +1055,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "BD": "x..x..xx..xx.x.x"
     }
   },
-  "COW\u2019D BELL - B": {
+  "COW’D BELL - B": {
     "section": "Funk and Soul",
     "instruments": {
       "CB": "x.xxx.xxx.xxx.xx",
@@ -1113,7 +1115,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
-      "SN": "....x..xxx..x.xx",
+      "SN": "....x..xgx..x.xx",
       "BD": "x.........x....."
     }
   },
@@ -1168,16 +1170,16 @@ const DRUM_PATTERN_TEMPLATES = {
   "EXPRESS YOURSELF - A": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxxx",
-      "SN": "....x..x.x.x.x.x",
+      "CY": "xgxgxgxgxgxgxgxg",
+      "SN": "....x..g.g.g.g.g",
       "BD": "x..x....x..x..x."
     }
   },
   "EXPRESS YOURSELF - B": {
     "section": "Funk and Soul",
     "instruments": {
-      "CY": "xxxxxxxxxxxxxxxx",
-      "SN": "....x..x.x.xx...",
+      "CY": "xgxgxgxgxgxgxgxg",
+      "SN": "....x..g.g.xx...",
       "BD": "x..x....x..x..x."
     }
   },
@@ -1217,7 +1219,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x...x...x...x...",
-      "SN": "....x..x.x....x.",
+      "SN": "....x..g.g....x.",
       "BD": "x.x.......x....."
     }
   },
@@ -1245,7 +1247,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "BD": "x..x..x...x....."
     }
   },
-  "I GOT THE FEELIN\u2019 - A": {
+  "I GOT THE FEELIN’ - A": {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
@@ -1253,7 +1255,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "BD": "x.x.......x....."
     }
   },
-  "I GOT THE FEELIN\u2019 - B": {
+  "I GOT THE FEELIN’ - B": {
     "section": "Funk and Soul",
     "instruments": {
       "CY": "x.x.x.x.x.x.x.x.",
@@ -1389,7 +1391,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Drum and Bass",
     "instruments": {
       "BD": "x.x.......x.....",
-      "SN": "....x..x.x....x.",
+      "SN": "....x..g.g....x.",
       "CH": "x.x.x.x.x.x.x.x.",
       "OH": "x..............."
     }
@@ -1398,7 +1400,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Drum and Bass",
     "instruments": {
       "BD": ".xx.......x.....",
-      "SN": ".x..x..x.x....x.",
+      "SN": ".x..x..g.g....x.",
       "CH": "x.x.x.x.x.x.x.x."
     }
   },
@@ -1619,7 +1621,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Breaks",
     "instruments": {
       "BD": "x.x...x...x.....",
-      "SN": "....x..x.x..x..."
+      "SN": "....x..g.g..x..."
     }
   },
   "POLYRHYTHMIC - A": {
@@ -1643,42 +1645,42 @@ const DRUM_PATTERN_TEMPLATES = {
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 FOLLOW WITH HYBRID BREAK ENDING 1": {
+  "⤷ FOLLOW WITH HYBRID BREAK ENDING 1": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x.........x.....",
       "SN": "....x....x..x..."
     }
   },
-  "\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 2": {
+  "⤷ OR FOLLOW WITH HYBRID BREAK ENDING 2": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x.....x.x..x....",
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 3": {
+  "⤷ OR FOLLOW WITH HYBRID BREAK ENDING 3": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x......x..x.....",
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 4": {
+  "⤷ OR FOLLOW WITH HYBRID BREAK ENDING 4": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x........x......",
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 5": {
+  "⤷ OR FOLLOW WITH HYBRID BREAK ENDING 5": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x.x.....x.x.....",
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 OR FOLLOW WITH HYBRID BREAK ENDING 6": {
+  "⤷ OR FOLLOW WITH HYBRID BREAK ENDING 6": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "x....x.x.xx.....",
@@ -1692,7 +1694,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 FOLLOW WITH HYBRID BREAK 7 - B": {
+  "⤷ FOLLOW WITH HYBRID BREAK 7 - B": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "xx......x.x.....",
@@ -1706,7 +1708,7 @@ const DRUM_PATTERN_TEMPLATES = {
       "SN": "....x.......x..."
     }
   },
-  "\u21b3 FOLLOW WITH HYBRID BREAK 8 - B": {
+  "⤷ FOLLOW WITH HYBRID BREAK 8 - B": {
     "section": "Hybrid Breaks With Alternate Endings",
     "instruments": {
       "BD": "xx......x.x.....",
@@ -1885,7 +1887,7 @@ const DRUM_PATTERN_TEMPLATES = {
     "section": "Breaks - Snare",
     "instruments": {
       "BD": "x.........x.....",
-      "SN": "....x....x....x."
+      "SN": "....x..g.x..g.x."
     }
   },
   "CONTEMPORARY SNARE 1 - B": {
@@ -1982,25 +1984,25 @@ const DRUM_PATTERN_TEMPLATES = {
   "GHOST SNARE 1 - A": {
     "section": "Ghost Snares",
     "instruments": {
-      "SN": "....x..x.x..x..x"
+      "SN": "....x..g.g..x..g"
     }
   },
   "GHOST SNARE 1 - B": {
     "section": "Ghost Snares",
     "instruments": {
-      "SN": "....x..x.x..x..."
+      "SN": "....x..g.g..x..."
     }
   },
   "GHOST SNARE 2 - A": {
     "section": "Ghost Snares",
     "instruments": {
-      "SN": ".x..x..x....x..x"
+      "SN": ".g..x..g....x..g"
     }
   },
   "GHOST SNARE 2 - B": {
     "section": "Ghost Snares",
     "instruments": {
-      "SN": ".x..x....x..x..x"
+      "SN": ".g..x....g..x..g"
     }
   },
   "CONTEMPORARY KICK 1 - A": {
@@ -2293,7 +2295,11 @@ function patternStringToSteps (pattern) {
   var body = (pattern || "").split("")
   for (var i = 0; i < body.length && i < 16; i++) {
     var ch = body[i].toLowerCase()
-    if (ch === 'x') steps.push(i + 1)
+    if (ch === 'x') {
+      steps.push({ step: i + 1, ghost: false })
+    } else if (ch === 'g') {
+      steps.push({ step: i + 1, ghost: true })
+    }
   }
   return steps
 }
@@ -2335,7 +2341,6 @@ function init () {
   const names = getPatternNames()
   const patternSetting = documentState.getEnumSetting('Pattern', 'Drum Pattern', names, names[0] || '')
   const clipType = documentState.getEnumSetting('Clip Type', 'Drum Pattern', ['Launcher', 'Arranger'], 'Launcher')
-  const velocitySetting = documentState.getNumberSetting('Velocity', 'Drum Pattern', 1, 127, 1, '', DEFAULT_VELOCITY)
 
   documentState.getSignalSetting('Export', 'Drum Pattern', 'Export Pattern').addSignalObserver(() => {
     const clip = clipType.get() === 'Arranger' ? cursorClipArranger : cursorClipLauncher
@@ -2349,7 +2354,7 @@ function init () {
       return
     }
 
-    writePatternToClip(clip, pattern, velocitySetting.getRaw(), DEFAULT_TRANSPOSE)
+    writePatternToClip(clip, pattern, DEFAULT_VELOCITY, DEFAULT_TRANSPOSE)
     host.showPopupNotification('Exported "' + pattern.n + '" to ' + clipType.get())
   })
 }
@@ -2438,10 +2443,20 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
 
     var steps = instruments[code]
     for (var i = 0; i < steps.length; i++) {
-      var stepNumber = steps[i]
+      var stepData = steps[i]
+      var stepNumber = stepData.step
+      var isGhostNote = stepData.ghost
+
       var stepIndex = Math.max(0, stepNumber - 1)
       var isStrong = (stepIndex % 4 === 0) || (code === 'SN' && (stepIndex % 8 === 4))
       var baseVel = isStrong ? rule.velStrong : rule.velWeak
+
+      // Override for ghost notes
+      if (isGhostNote) {
+        // Ghost notes are significantly quieter
+        baseVel = Math.min(baseVel, rule.velWeak * 0.5)
+      }
+
       var jitter = (Math.random() * 12) - 6
       var finalVel = clampVelocity(Math.round((baseVel + jitter) * velocityScale))
 
@@ -2457,8 +2472,8 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
           vel: finalVel
         })
 
-        // Ghost snares for a bit of feel
-        if (code === 'SN' && isStrong) {
+        // Probabilistic Ghost snares (kept for extra variation, only on strong hits that ARE NOT already ghosts)
+        if (code === 'SN' && isStrong && !isGhostNote) {
           var ghostChance = rule.ghostChance || SECTION_RULES['Default'].ghostChance
           if (Math.random() < ghostChance) {
             var ghostTime = eventTime - 1
