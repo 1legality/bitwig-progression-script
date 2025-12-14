@@ -117,19 +117,19 @@ const noteMap = {
 
 const OCTAVE_ADJUSTMENT_THRESHOLD = 6;
 
-function init () {
+function init() {
   println('Text To Midi ready!')
   const documentState = host.getDocumentState()
   const cursorClipLauncher = host.createLauncherCursorClip(16 * 128, 128)
   const cursorClipArranger = host.createArrangerCursorClip(16 * 128, 128)
   cursorClipLauncher.scrollToKey(0)
   cursorClipArranger.scrollToKey(0)
-  
+
   const progressionText = documentState.getStringSetting('Progression', 'Text To Midi', 512, 'C:1 Am:1 F:1 G:1')
   const clipType = documentState.getEnumSetting('Clip Type', 'Text To Midi', ['Launcher', 'Arranger'], 'Launcher')
   const baseOctave = documentState.getNumberSetting('Base Octave', 'Text To Midi', 0, 8, 1, '', 4)
   const outputType = documentState.getEnumSetting('Output Type', 'Text To Midi', ['Chords + Bass', 'Chords only', 'Bass only', 'Bass + Fifth'], 'Chords + Bass')
-  const inversionType = documentState.getEnumSetting('Inversion', 'Text To Midi', ['None', '1st Inversion', 'Smooth Voice Leading', 'Pianist', 'Open Voicing', 'Spread'], 'None')
+  const inversionType = documentState.getEnumSetting('Inversion', 'Text To Midi', ['None', '1st Inversion', 'Smooth Voice Leading', 'Pianist', 'Open Voicing', 'Spread'], 'Smooth Voice Leading')
 
   documentState.getSignalSetting('Generate', 'Text To Midi', 'Generate!').addSignalObserver(() => {
     const progression = progressionText.get()
@@ -137,8 +137,8 @@ function init () {
     cursorClip.clearSteps()
     parseAndGenerate(progression, cursorClip)
   })
-  
-  documentState.getSignalSetting('Open Web Editor', 'Text To Midi', 'Open Web Editor!').addSignalObserver(() => {
+
+  documentState.getSignalSetting('Open Web Editor', 'Text To Midi', 'Open Web Editor').addSignalObserver(() => {
     // Map by displayed label (matches how settings were defined)
     const outputMap = {
       'Chords + Bass': 'chordsAndBass',
@@ -182,7 +182,7 @@ function init () {
     openUrlInBrowser(url)
   })
 
-  documentState.getSignalSetting('Google Gemini', 'Text To Midi', 'Open Google Gemini').addSignalObserver(() => {
+  documentState.getSignalSetting('Google Gemini Generator', 'Text To Midi', 'Open Google Gemini Generator').addSignalObserver(() => {
     const url = 'https://gemini.google.com/gem/1mEp9hCTbbA9UybeB3l8-ZQEkzQKC1TXh?usp=sharing'
     println(`[AI Ideas] Opening Google Gemini: ${url}`)
     host.showPopupNotification('Opening Google Gemini prompt helper')
@@ -190,7 +190,7 @@ function init () {
   })
 
   // Helper: Try to open a URL in the system browser, with safe fallbacks
-  function openUrlInBrowser (url) {
+  function openUrlInBrowser(url) {
     try {
       // Prefer host-provided helpers if available
       if (typeof host.openUrlInBrowser === 'function') {
@@ -287,7 +287,7 @@ function init () {
           clip.setContents(new StringSelection(url), null)
           copied = true
         }
-      } catch (ignore) {}
+      } catch (ignore) { }
 
       // Nashorn path
       if (!copied && typeof Java !== 'undefined' && typeof Java.type === 'function') {
@@ -313,12 +313,12 @@ function init () {
   }
 
   // getCursorClip helper used by buttons below
-  
-  function getCursorClip () {
+
+  function getCursorClip() {
     return clipType.get() === 'Arranger' ? cursorClipArranger : cursorClipLauncher
   }
 
-  function parseAndGenerate (progressionString, cursorClip) {
+  function parseAndGenerate(progressionString, cursorClip) {
     const baseMidiNote = (baseOctave.getRaw() + 1) * 12
     const outputMode = outputType.get()
     const inversionMode = inversionType.get()
@@ -333,10 +333,10 @@ function init () {
 
       let durationInBars = 1.0; // Default to 1 bar
       if (durationDef) {
-          const parsedDuration = parseFloat(durationDef);
-          if (!isNaN(parsedDuration)) {
-              durationInBars = parsedDuration;
-          }
+        const parsedDuration = parseFloat(durationDef);
+        if (!isNaN(parsedDuration)) {
+          durationInBars = parsedDuration;
+        }
       }
 
       const durationInBeats = durationInBars * 4.0;
@@ -360,7 +360,7 @@ function init () {
           remainder = chordDef.substring(1)
         }
       }
-      
+
       let slashNoteName = null
       const slashIndex = remainder.indexOf('/')
       if (slashIndex > -1) {
@@ -406,7 +406,7 @@ function init () {
       if (inversionMode !== 'None' && outputMode.indexOf('Chords') > -1) {
         chordNotes = applyInversion(chordNotes, inversionMode, previousChordNotes, currentBaseOctave)
       }
-      
+
       if (outputMode.indexOf('Chords') > -1) {
         previousChordNotes = [...chordNotes]
       } else {
@@ -449,7 +449,7 @@ function init () {
       }
 
       for (const midiNote of notesToWrite) {
-        cursorClip.setStep(0, currentTime_in_16ths, midiNote, 100, durationInBeats)
+        cursorClip.setStep(0, currentTime_in_16ths, midiNote, 110, durationInBeats)
       }
 
       currentTime_in_16ths += durationIn16ths
@@ -462,74 +462,74 @@ function init () {
  * Generates all possible inversions for a given set of root-position chord notes.
  */
 function generateInversions(rootPositionNotes) {
-    if (rootPositionNotes.length <= 1) {
-        return [rootPositionNotes];
+  if (rootPositionNotes.length <= 1) {
+    return [rootPositionNotes];
+  }
+  const allInversions = [];
+  let currentVoicing = [...rootPositionNotes];
+  for (let i = 0; i < rootPositionNotes.length; i++) {
+    currentVoicing.sort((a, b) => a - b);
+    allInversions.push([...currentVoicing]);
+    if (i < rootPositionNotes.length - 1) {
+      const lowestNote = currentVoicing.shift();
+      if (lowestNote !== undefined) {
+        currentVoicing.push(lowestNote + 12);
+      }
     }
-    const allInversions = [];
-    let currentVoicing = [...rootPositionNotes];
-    for (let i = 0; i < rootPositionNotes.length; i++) {
-        currentVoicing.sort((a, b) => a - b);
-        allInversions.push([...currentVoicing]);
-        if (i < rootPositionNotes.length - 1) {
-            const lowestNote = currentVoicing.shift();
-            if (lowestNote !== undefined) {
-                currentVoicing.push(lowestNote + 12);
-            }
-        }
-    }
-    return allInversions;
+  }
+  return allInversions;
 }
 
 /**
  * Calculates a distance metric between two chord voicings to estimate smoothness.
  */
 function calculateVoicingDistance(voicing1, voicing2) {
-    const sorted1 = [...voicing1].sort((a, b) => a - b);
-    const sorted2 = [...voicing2].sort((a, b) => a - b);
-    let totalDistance = 0;
-    const minLength = Math.min(sorted1.length, sorted2.length);
-    const maxLength = Math.max(sorted1.length, sorted2.length);
-    for (let i = 0; i < minLength; i++) {
-        totalDistance += Math.abs(sorted1[i] - sorted2[i]);
-    }
-    const noteCountDifference = maxLength - minLength;
-    totalDistance += noteCountDifference * 6; // Penalty for different number of notes
-    return totalDistance;
+  const sorted1 = [...voicing1].sort((a, b) => a - b);
+  const sorted2 = [...voicing2].sort((a, b) => a - b);
+  let totalDistance = 0;
+  const minLength = Math.min(sorted1.length, sorted2.length);
+  const maxLength = Math.max(sorted1.length, sorted2.length);
+  for (let i = 0; i < minLength; i++) {
+    totalDistance += Math.abs(sorted1[i] - sorted2[i]);
+  }
+  const noteCountDifference = maxLength - minLength;
+  totalDistance += noteCountDifference * 6; // Penalty for different number of notes
+  return totalDistance;
 }
 
 /**
  * Adjusts chord voicings to be closer to the target octave.
  */
 function adjustVoicingsToTargetOctave(voicings, baseOctave) {
-    if (!voicings || voicings.length === 0) {
-        return [];
+  if (!voicings || voicings.length === 0) {
+    return [];
+  }
+  const targetCenterPitch = 12 * (baseOctave + 1); // C note in the target octave
+
+  return voicings.map(voicing => {
+    if (!voicing || voicing.length === 0) {
+      return [];
     }
-    const targetCenterPitch = 12 * (baseOctave + 1); // C note in the target octave
+    const sum = voicing.reduce((acc, note) => acc + note, 0);
+    const averagePitch = sum / voicing.length;
+    const difference = averagePitch - targetCenterPitch;
 
-    return voicings.map(voicing => {
-        if (!voicing || voicing.length === 0) {
-            return [];
+    if (Math.abs(difference) > OCTAVE_ADJUSTMENT_THRESHOLD) {
+      const octaveShift = Math.round(difference / 12);
+      if (octaveShift !== 0) {
+        const semitoneShift = octaveShift * -12;
+        const adjustedVoicing = voicing.map(note => note + semitoneShift);
+        const minNote = Math.min(...adjustedVoicing);
+        const maxNote = Math.max(...adjustedVoicing);
+        if (minNote >= 0 && maxNote <= 127) {
+          return adjustedVoicing.sort((a, b) => a - b);
+        } else {
+          return voicing.sort((a, b) => a - b);
         }
-        const sum = voicing.reduce((acc, note) => acc + note, 0);
-        const averagePitch = sum / voicing.length;
-        const difference = averagePitch - targetCenterPitch;
-
-        if (Math.abs(difference) > OCTAVE_ADJUSTMENT_THRESHOLD) {
-            const octaveShift = Math.round(difference / 12);
-            if (octaveShift !== 0) {
-                const semitoneShift = octaveShift * -12;
-                const adjustedVoicing = voicing.map(note => note + semitoneShift);
-                const minNote = Math.min(...adjustedVoicing);
-                const maxNote = Math.max(...adjustedVoicing);
-                if (minNote >= 0 && maxNote <= 127) {
-                    return adjustedVoicing.sort((a, b) => a - b);
-                } else {
-                    return voicing.sort((a, b) => a - b);
-                }
-            }
-        }
-        return voicing.sort((a, b) => a - b);
-    });
+      }
+    }
+    return voicing.sort((a, b) => a - b);
+  });
 }
 
 /**
@@ -540,7 +540,7 @@ function adjustVoicingsToTargetOctave(voicings, baseOctave) {
  * @param {number[]} previousChordNotes - The notes of the previous chord, for distance calculation.
  * @returns {number[]} A new voicing with semitone clashes resolved.
  */
-function resolveSemitoneClashes (voicing, previousChordNotes) {
+function resolveSemitoneClashes(voicing, previousChordNotes) {
   if (voicing.length < 2 || !previousChordNotes || previousChordNotes.length === 0) {
     return voicing
   }
@@ -578,93 +578,93 @@ function resolveSemitoneClashes (voicing, previousChordNotes) {
  * Main function to apply inversion/voicing algorithms.
  */
 function applyInversion(chordNotes, inversionType, previousChordNotes, baseOctave) {
-    let newVoicing = [...chordNotes].sort((a, b) => a - b);
+  let newVoicing = [...chordNotes].sort((a, b) => a - b);
 
-    switch (inversionType) {
-        case 'None':
-            return newVoicing;
+  switch (inversionType) {
+    case 'None':
+      return newVoicing;
 
-        case '1st Inversion':
-            if (newVoicing.length > 1) {
-                const lowestNote = newVoicing.shift();
-                newVoicing.push(lowestNote + 12);
-            }
-            break;
+    case '1st Inversion':
+      if (newVoicing.length > 1) {
+        const lowestNote = newVoicing.shift();
+        newVoicing.push(lowestNote + 12);
+      }
+      break;
 
-        case 'Smooth Voice Leading':
-            if (previousChordNotes && newVoicing.length > 1) {
-                // The target for smooth voice leading is the previous chord itself.
-                const targetVoicing = previousChordNotes;
-                const targetAverage = targetVoicing.reduce((acc, note) => acc + note, 0) / targetVoicing.length;
+    case 'Smooth Voice Leading':
+      if (previousChordNotes && newVoicing.length > 1) {
+        // The target for smooth voice leading is the previous chord itself.
+        const targetVoicing = previousChordNotes;
+        const targetAverage = targetVoicing.reduce((acc, note) => acc + note, 0) / targetVoicing.length;
 
-                const possibleInversions = generateInversions(chordNotes);
-                let bestVoicing = newVoicing; // Fallback, will be overwritten.
-                let minDistance = Infinity;
+        const possibleInversions = generateInversions(chordNotes);
+        let bestVoicing = newVoicing; // Fallback, will be overwritten.
+        let minDistance = Infinity;
 
-                for (const inversion of possibleInversions) {
-                    // Temporarily shift this inversion to the same octave as the previous chord.
-                    const invAverage = inversion.reduce((acc, note) => acc + note, 0) / inversion.length;
-                    const octaveDifference = Math.round((targetAverage - invAverage) / 12);
-                    const adjustedInversion = inversion.map(note => note + octaveDifference * 12);
+        for (const inversion of possibleInversions) {
+          // Temporarily shift this inversion to the same octave as the previous chord.
+          const invAverage = inversion.reduce((acc, note) => acc + note, 0) / inversion.length;
+          const octaveDifference = Math.round((targetAverage - invAverage) / 12);
+          const adjustedInversion = inversion.map(note => note + octaveDifference * 12);
 
-                    // Resolve semitone clashes before calculating the final distance.
-                    // This ensures we only choose from musically valid voicings.
-                    const finalCandidate = resolveSemitoneClashes(adjustedInversion, targetVoicing);
+          // Resolve semitone clashes before calculating the final distance.
+          // This ensures we only choose from musically valid voicings.
+          const finalCandidate = resolveSemitoneClashes(adjustedInversion, targetVoicing);
 
-                    const distance = calculateVoicingDistance(targetVoicing, finalCandidate);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        bestVoicing = finalCandidate;
-                    }
-                }
-                newVoicing = bestVoicing;
-            }
-            // If it's the first chord, do nothing and let it be in root position in the target octave.
-            break;
+          const distance = calculateVoicingDistance(targetVoicing, finalCandidate);
+          if (distance < minDistance) {
+            minDistance = distance;
+            bestVoicing = finalCandidate;
+          }
+        }
+        newVoicing = bestVoicing;
+      }
+      // If it's the first chord, do nothing and let it be in root position in the target octave.
+      break;
 
-        case 'Pianist':
-            const root = newVoicing[0];
-            const topVoices = newVoicing.slice(1).map(n => n - 12);
-            const SPREAD_BASE = 12;
-            if (previousChordNotes && topVoices.length > 1) {
-                const possibleVoicings = generateInversions(topVoices);
-                let bestTopVoicing = topVoices;
-                let minDistance = Infinity;
-                for (const inversion of possibleVoicings) {
-                    const spreadInversion = inversion.map((note, i) => note + SPREAD_BASE + i * 2);
-                    const testVoicing = [root, ...spreadInversion];
-                    const distance = calculateVoicingDistance(previousChordNotes, testVoicing);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        bestTopVoicing = spreadInversion;
-                    }
-                }
-                newVoicing = [root, ...bestTopVoicing];
-            } else {
-                const spreadTop = topVoices.map((note, i) => note + SPREAD_BASE + i * 2);
-                newVoicing = [root, ...spreadTop];
-            }
-            break;
+    case 'Pianist':
+      const root = newVoicing[0];
+      const topVoices = newVoicing.slice(1).map(n => n - 12);
+      const SPREAD_BASE = 12;
+      if (previousChordNotes && topVoices.length > 1) {
+        const possibleVoicings = generateInversions(topVoices);
+        let bestTopVoicing = topVoices;
+        let minDistance = Infinity;
+        for (const inversion of possibleVoicings) {
+          const spreadInversion = inversion.map((note, i) => note + SPREAD_BASE + i * 2);
+          const testVoicing = [root, ...spreadInversion];
+          const distance = calculateVoicingDistance(previousChordNotes, testVoicing);
+          if (distance < minDistance) {
+            minDistance = distance;
+            bestTopVoicing = spreadInversion;
+          }
+        }
+        newVoicing = [root, ...bestTopVoicing];
+      } else {
+        const spreadTop = topVoices.map((note, i) => note + SPREAD_BASE + i * 2);
+        newVoicing = [root, ...spreadTop];
+      }
+      break;
 
-        case 'Open Voicing':
-            if (newVoicing.length > 2) {
-                newVoicing[1] -= 12; // Drop the 3rd down an octave
-            }
-            break;
+    case 'Open Voicing':
+      if (newVoicing.length > 2) {
+        newVoicing[1] -= 12; // Drop the 3rd down an octave
+      }
+      break;
 
-        case 'Spread': // Implementing 'spread' from the TS file
-            if (newVoicing.length > 1) {
-                const root = newVoicing[0];
-                const spreadNotes = newVoicing.slice(1).map((note, i) => note + 12 * (i % 2));
-                newVoicing = [root, ...spreadNotes];
-            }
-            break;
-    }
+    case 'Spread': // Implementing 'spread' from the TS file
+      if (newVoicing.length > 1) {
+        const root = newVoicing[0];
+        const spreadNotes = newVoicing.slice(1).map((note, i) => note + 12 * (i % 2));
+        newVoicing = [root, ...spreadNotes];
+      }
+      break;
+  }
 
-    return newVoicing.sort((a, b) => a - b);
+  return newVoicing.sort((a, b) => a - b);
 }
 
-function flush () {}
-function exit () {
+function flush() { }
+function exit() {
   println('-- Text To Midi Bye! --')
 }

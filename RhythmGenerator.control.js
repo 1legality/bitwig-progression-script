@@ -9,9 +9,9 @@ host.setShouldFailOnDeprecatedUse(true)
 host.defineController('1legality', 'Rhythm Generator', '0.1', '64fc7e0d-6c39-4f46-8b10-6814139d5172', '1legality')
 
 // --- Constants ---
-const TPQ = 96 
-const TICKS_16TH = TPQ / 4 
-const BAR_TICKS = 4 * TPQ 
+const TPQ = 96
+const TICKS_16TH = TPQ / 4
+const BAR_TICKS = 4 * TPQ
 
 // Updated with recommended BPM ranges, sorted alphanumerically
 const GENRES = [
@@ -27,25 +27,31 @@ const GENRES = [
   'Tribal (125)'
 ]
 const INSTRUMENTS = (() => {
-  const rest = ['Bass', 'Bell', 'Hi-Hat', 'Kick', 'Percussion', 'Ride', 'Shaker', 'Snare', 'Tom'].sort()
+  const rest = ['Bass', 'CB', 'CH', 'BD', 'RS', 'CY', 'SH', 'SN', 'LT'].sort()
   return ['All'].concat(rest)
 })()
 
-// --- TIMBRE GUIDE & DEFAULT NOTES ---
-const NOTES = {
-  'Kick': 18,       // C1 in bitwig
-  'Snare': 20,      
-  'Hi-Hat': 24,     
-  'Shaker': 23,     
-  'Tom': 25,        
-  'Percussion': 27, 
-  'Ride': 29,       
-  'Bell': 30,
-  'Bass': 36       // C2 anchor for simple bass ostinatos
-}
+const DEFAULT_VELOCITY = 110
+const DEFAULT_TRANSPOSE = -18 // Fixed: 0 shift to keep BD at C1 (36). -30 was dropping it to F#-2.
 
-const OCTAVE_OFFSET = 0
-var globalPitchOffset = 0 
+const GM_DRUM_MAP = {
+  "BD": 36,
+  "SN": 38,
+  "CH": 42,
+  "OH": 46,
+  "LT": 45,
+  "MT": 47,
+  "HT": 50,
+  "CL": 39,
+  "SH": 44,
+  "RS": 37,
+  "CB": 51,
+  "CY": 49,
+  "HC": 39,
+  "AC": 57,
+  "LC": 64,
+  "Bass": 36 // Custom: Anchor for bass
+}
 
 function clampNote(n) {
   if (typeof n !== 'number') n = Number(n) || 0
@@ -55,19 +61,115 @@ function clampNote(n) {
   return n
 }
 
+/**
+ * Calculates the transposed MIDI note, ensuring it wraps within valid octaves
+ * and stays within the 0-127 MIDI range.
+ * Mirrors logic from DrumPattern.control.js.
+ * 
+ * @param {number} baseNote - The source MIDI note (default 36/C1)
+ * @param {number} transpose - transposition amount in semitones
+ * @returns {number} Valid MIDI note (0-127)
+ */
+function getTransposedNote(baseNote = 36, transpose = 0) {
+  let note = baseNote + transpose
+
+  // Wrap octaves if out of range to keep the same note class (e.g. C)
+  while (note < 0) note += 12
+  while (note > 127) note -= 12
+
+  return clampNote(note)
+}
+
+function createVariation(pattern, inst, genre) {
+  // Convert string to array for easier manipulation
+  let chars = pattern.split('')
+
+  // Helper to safely set a char if it's empty
+  const fill = (idx, char) => {
+    if (idx >= 0 && idx < 16 && chars[idx] === '.') {
+      chars[idx] = char
+    }
+  }
+
+  // 1. DENSITY VARIATION (CH, SH, CY, LT, etc)
+  if (['CH', 'SH', 'CY', 'LT', 'RS', 'CB'].indexOf(inst) >= 0) {
+    // Fill in some gaps 
+    for (let i = 0; i < 16; i++) {
+      // Add 16ths in empty spots with 20% chance
+      if (Math.random() < 0.2) fill(i, 'x')
+    }
+
+    // Techno/House: Add open hat on off-beat if not present
+    if ((genre === 'Techno' || genre === 'House') && inst === 'CH') {
+      fill(2, 'o'); fill(6, 'o'); fill(10, 'o'); fill(14, 'o')
+    }
+  }
+
+  // 2. KICK VARIATION (BD, Bass)
+  if (inst === 'BD' || inst === 'Bass') {
+    // Add a pickup kick at end of bar
+    if (Math.random() > 0.3) fill(15, 'x')
+
+    // Double a kick: Find a kick, add one after it if empty
+    for (let i = 0; i < 14; i++) {
+      if (chars[i] === 'x' && chars[i + 1] === '.' && Math.random() < 0.25) {
+        fill(i + 1, 'x')
+      }
+    }
+  }
+
+  // 3. SNARE VARIATION (SN)
+  if (inst === 'SN') {
+    // Add ghost notes before hits
+    for (let i = 1; i < 16; i++) {
+      if (chars[i] === 'x' && chars[i - 1] === '.' && Math.random() < 0.4) {
+        fill(i - 1, 'x') // Add a pre-hit
+      }
+    }
+
+    // Simple end fill
+    if (Math.random() > 0.3) {
+      fill(14, 'x')
+      fill(15, 'x')
+    }
+  }
+
+  return chars.join('')
+}
+
 // --- TEMPLATES ---
 const TEMPLATES = {
-  'Kick': {
+  'BD': {
     'Trap': ['x.........x.....', 'x...........x...', 'x..x......x.....', 'x.........x..x..', 'x.......x.x.....'],
     'Drill': ['x.........x...x.', 'x...x.....x...x.', 'x.........x.x...', 'x.....x...x.....', 'x...x...x...x...'],
-    'Lofi': ['x.........x..x..', 'x...x.....x.....', 'x.........x.....', 'x.......x.......'],
+    'Lofi': [
+      'x.........x..x..', // Classic
+      'x.............x.', // Super lazy
+      'x...x..x..x.....', // Dilla kick
+      'x.........x.....', // Sparse
+      'x.......x..x....'  // Off-kilter
+    ],
     'Boom Bap': ['x.........xx....', 'x..x......x.....', 'x.........x.x...', 'x.....x.x.......'],
     'House': ['x...x...x...x...', 'x...x...x...x...', 'x..x.x..x..x.x..', 'x.......x...x...'],
     'Techno': ['x...x...x...x...', 'x...x...x...x...', 'x..xx...x..xx...', 'x...x.x.x...x...'],
     'Ambient': ['x...............', 'x.......x.......', '................'],
     'Tribal': ['x.....x.....x...', 'x...x...x.x.....', 'x..x..x.....x...'],
-    'Amen Brother': ['x.x.......xx....', 'x.........xx..x.', '..x.......xx....', 'x.x.......x.....'],
-    'Synthwave': ['x...x...x...x...', 'x...x...x..x.x..', 'x...x.....x.x...', 'x.......x...x...'] // Driving 4/4 with slight variations
+    'Amen Brother': [
+      // MAINS (0-2)
+      'x.x.......xx....', // Classic
+      'x.........xx..x.', // Variation
+      '..x.......xx....', // Late entry
+      // FILLS (3-5)
+      'x.x...x...xx..x.', // Busy Kick
+      'x.x.x.x.x.xx....', // Machine gun
+      'xx..xx..xx..xx..'  // Full roll
+    ],
+    'Synthwave': [
+      'x...x...x...x...', // Reliable 4-on-the-floor
+      'x...x...x..x.x..', // Slight push
+      'x...x..x.x..x...', // Funky kick
+      'x...x...x...x..x'  // Pickup
+    ]
   },
   'Bass': {
     'Trap': [
@@ -107,35 +209,72 @@ const TEMPLATES = {
       'x...x..x...x...x', 'x..x...x..x...x.', 'x...x.x...x...x.'
     ],
     'Synthwave': [
-      'x...x...x...x...', 'x...x...x...x.x.', 'x...x...x..x.x..',
-      'x...x...xx..x...', 'x..x...x..x...x.', 'x...x...x...xx..'
+      'x.......x.......', // Simple
+      'x...x...x...x...', // Driving 8ths
+      'x.x.x...x.x.x...', // Funky
+      'x...x.x...x.x...'  // Disco bass
     ]
   },
-  'Snare': {
+  'SN': {
     'Trap': ['........x.......', '........x.......', '........x...x...', '........x.x.....'],
     'Drill': ['......x.......x.', '......x.....x...', 'xxx...x.......x.', '......x...x...x.'],
-    'Lofi': ['....x.......x...', '....x.......x.x.', '....x.....x.x...', '....x.......x...'],
+    'Lofi': [
+      '....x.......x...', // Standard
+      '....x.......x.x.', // Ghost end
+      '....x..x....x...', // Double
+      '....x...x...x...' // Lazy syncopation
+    ],
     'Boom Bap': ['....x.......x...', '....x..x....x...', '....x.......x.x.'],
     'House': ['....x.......x...', '....x.......x...', '....x.....x.x...', '..x.....x.......'],
     'Techno': ['....x.......x...', '....x.......x...', '................'],
     'Ambient': ['................', '....x.......x...', '................'],
     'Tribal': ['....x.......x...', '..x.....x.......', '......x.......x.'],
-    'Amen Brother': ['....x..x.x..x...', '....x.......x.x.', '....x.......x...', '..x.x..x.x..x...', '....x...x.x.x...'],
-    'Synthwave': ['....x.......x...', '....x.......x.x.', '....x..x....x...'] // Big gated snares on 2 and 4
+    'Amen Brother': [
+      // MAINS (0-2)
+      '....x..x.x..x...', // The Standard
+      '....x.......x.x.', // Ghosty end
+      '..x.x..x.x..x...', // Displaced
+      // FILLS (3-5)
+      '....x...x.x.x...', // Roll end
+      '....x..x.x.x.x..', // Intense
+      '..x...x...x...x.'  // Jungle chop
+    ],
+    'Synthwave': [
+      '....x.......x...', // Solid 2/4
+      '....x.......x.x.', // Ghost end
+      '....x..x.x..x...', // French house shuffle
+      '..x.....x.......'  // Clap style
+    ]
   },
-  'Hi-Hat': {
+  'CH': {
     'Trap': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.xxx.x.', 'x...x...x...x...', 'x.......x.......', 'x.x.x.x.x.......', 'x.x...x.x.x...x.'],
     'Drill': ['x..x..x.x..x..x.', 'x..x.x..x..x.x..', 'x..x..x...x..x..', '.x..x..x.x..x..x', 'x...x...x..x..x.'],
-    'Lofi': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.', 'x.x...x.x.x.....', '....x.......x...', 'x-x-x-x-x-x-x-x-'],
+    'Lofi': [
+      'x.x.x.x.x.x.x.x.', // Straight-ish 8ths
+      'x-x-x-x-x-x-x-x-', // Swing 8ths
+      'x.x.x.x.x.x.....', // Space
+      'x...x...x...x...', // Qtrs
+      'x.x.x...x.x.x...'  // Broken
+    ],
     'Boom Bap': ['x.x.x.x.x.x.x.x.', 'x-x-x-x-x-x-x-x-', 'x.x..x..x.x..x..', 'x...x.x.x...x.x.', 'x.......x.x.x...'],
     'House': ['.o.o.o.o.o.o.o.o', 'x.o.x.o.x.o.x.o.', 'x...x...x...x...', '..x...x...x...x.', 'x.x.x.o.x.x.x.o.'],
     'Techno': ['x.x.x.x.x.x.x.x.', '.x.x.x.x.x.x.x.x', 'xxxx.xxxxxxx.xxx', '..x...x...x...x.'],
     'Ambient': ['...x.......x....', 'x.......x.......', '.......x.......x', '. . . . x . . . ', '................'],
     'Tribal': ['..x...x...x...x.', 'x...x.x.x...x...', '..x.x...x.x...x.'],
-    'Amen Brother': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.xx.xx.'],
-    'Synthwave': ['x.x.x.x.x.x.x.x.', 'xxxxxxxxxxxxxxxx', 'x.x.x.x.x.x.x.o.', 'x...x...x...x...'] // 8ths, 16ths, or disco offbeats
+    'Amen Brother': [
+      'x.x.x.x.x.x.x.x.', // Ride/Hat steady
+      'x.x.x.x.x.xx.xx.', // Funky shuffle
+      'x.x.x.x.x.x.x.o.', // Open hat end
+      'x.xx.xx.x.xx.xx.'  // Intense ride
+    ],
+    'Synthwave': [
+      '..o...o...o...o.', // The Classic French Touch Open Hat
+      'x.o.x.o.x.o.x.o.', // Driving Disco
+      'x.x.x.x.x.x.x.x.', // 8th note shaker feel
+      'xxx.xxx.xxx.xxx.'  // Gallop
+    ]
   },
-  'Shaker': {
+  'SH': {
     'Trap': ['x.x.x.x.x.x.x.x.', 'x.xxx.xxx.xxx.xx', 'x...x...x...x...', '..x...x...x...x.'],
     'Drill': ['x.x.x.x.x.x.x.x.', '-.x.-.x.-.x.-.x.', 'x..x..x..x..x..x', '......x.......x.'],
     'Lofi': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x...', 'x...x...x...x...', '..x.x.x...x.x.x.'],
@@ -147,7 +286,7 @@ const TEMPLATES = {
     'Amen Brother': ['x.x.x.x.x.x.x.x.'],
     'Synthwave': ['x.x.x.x.x.x.x.x.', '................', 'xxxxxxxxxxxxxxxx']
   },
-  'Tom': {
+  'LT': {
     'Trap': ['................', '..............xx', '............x.x.', 'x...............'],
     'Drill': ['..............x.', '..........x..x..', '..x.............', 'x..x..x.........'],
     'Lofi': ['................', '..............f.', '..........x.....'],
@@ -159,7 +298,7 @@ const TEMPLATES = {
     'Amen Brother': ['................', '............x...', '..x...x.........'],
     'Synthwave': ['............xxxx', '..........x.x...', 'x.x.............', '..............x.'] // Iconic fills
   },
-  'Percussion': {
+  'RS': {
     'Trap': ['..x...x...x...x.', '....x.......x...', 'x.......x.......', '......x...x.....'],
     'Drill': ['..x.....x.......', '......x...x.....', '....x.......x...', 'x.....x.....x...'],
     'Lofi': ['....x.......x...', '..x...x...x.....', '........x.......', 'x.x.............'],
@@ -171,7 +310,7 @@ const TEMPLATES = {
     'Amen Brother': ['..x.............', 'x.......x.......'],
     'Synthwave': ['....x.......x...', '..x...x...x.....']
   },
-  'Ride': {
+  'CY': {
     'Trap': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.......x.......'],
     'Drill': ['x...x...x...x...', 'x..x..x.x..x..x.', 'x.......x.......'],
     'Lofi': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x..x..x..x..x..x'],
@@ -183,7 +322,7 @@ const TEMPLATES = {
     'Amen Brother': ['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.xx.xx.', 'x.xx.xx.x.xx.xx.', 'x...x.x.x...x.x.'],
     'Synthwave': ['x...x...x...x...', 'x.x.x.x.x.x.x.x.']
   },
-  'Bell': {
+  'CB': {
     'Trap': ['x...............', '............x...', '..x.......x.....'],
     'Drill': ['..x.............', 'x.....x.....x...', '....x.......x...'],
     'Lofi': ['..x.............', '......x.........'],
@@ -200,14 +339,14 @@ const TEMPLATES = {
 const RULES = {
   'Trap': { velStrong: 110, velWeak: 70, swing: 0 },
   'Drill': { velStrong: 100, velWeak: 60, swing: 0 },
-  'Lofi': { velStrong: 85, velWeak: 50, swing: 0.25 },
+  'Lofi': { velStrong: 85, velWeak: 45, swing: 0.32 }, // Heavy swing
   'Boom Bap': { velStrong: 95, velWeak: 60, swing: 0.15 },
   'House': { velStrong: 100, velWeak: 50, swing: 0.05 },
   'Techno': { velStrong: 100, velWeak: 85, swing: 0 },
   'Ambient': { velStrong: 65, velWeak: 40, swing: 0 },
   'Tribal': { velStrong: 115, velWeak: 75, swing: 0.18 },
   'Amen Brother': { velStrong: 120, velWeak: 55, swing: 0.10 },
-  'Synthwave': { velStrong: 110, velWeak: 80, swing: 0 } // Machine-like, no swing
+  'Synthwave': { velStrong: 115, velWeak: 85, swing: 0.12 } // MPC Swing for French House
 }
 
 var sectionSetting, instrumentSetting
@@ -215,29 +354,25 @@ var cursorClipLauncher, cursorClipArranger
 var clipTypeSetting
 var transport
 
-function init () {
+function init() {
   println('Rhythm Generator v0.1 (Alphanumeric Sort) Initialized')
   const documentState = host.getDocumentState()
   transport = host.createTransport()
-  
+
   cursorClipLauncher = host.createLauncherCursorClip(16 * 128, 128)
   cursorClipArranger = host.createArrangerCursorClip(16 * 128, 128)
 
-  const defaultScrollKey = clampNote((NOTES['Kick'] || 36) + OCTAVE_OFFSET)
-  try { cursorClipLauncher.scrollToKey(defaultScrollKey) } catch (e) {}
-  try { cursorClipArranger.scrollToKey(defaultScrollKey) } catch (e) {}
+  const defaultScrollKey = getTransposedNote(GM_DRUM_MAP['BD'], DEFAULT_TRANSPOSE)
+  try { cursorClipLauncher.scrollToKey(defaultScrollKey) } catch (e) { }
+  try { cursorClipArranger.scrollToKey(defaultScrollKey) } catch (e) { }
 
   instrumentSetting = documentState.getEnumSetting('Instrument', 'Generator', INSTRUMENTS, INSTRUMENTS[0])
   sectionSetting = documentState.getEnumSetting('Genre', 'Generator', GENRES, GENRES[0])
   clipTypeSetting = documentState.getEnumSetting('Clip Type', 'Generator', ['Launcher', 'Arranger'], 'Launcher')
 
-  // --- GLOBAL PITCH SHIFT SETTING ---
-  const shiftSetting = documentState.getNumberSetting('Global Pitch Shift', 'Generator', -48, 48, 1, 'st', 0)
-  shiftSetting.addValueObserver(function(val) {
-      globalPitchOffset = val
-  })
 
-  documentState.getSignalSetting('Generate', 'Generator', 'FIRE').addSignalObserver(() => {
+
+  documentState.getSignalSetting('Generate', 'Generator', 'Generate!').addSignalObserver(() => {
     generateAndWrite()
   })
 }
@@ -247,58 +382,64 @@ function init () {
  */
 function selectEnsemble(genre) {
   // 1. Foundation
-  let active = ['Kick', 'Snare']
+  let active = ['BD', 'SN']
 
   // 2. Primary Driver
-  const drivers = ['Hi-Hat', 'Shaker', 'Ride']
+  const drivers = ['CH', 'SH', 'CY']
   let driver = drivers[Math.floor(Math.random() * drivers.length)]
 
-  if (genre === 'Trap' || genre === 'Drill') driver = 'Hi-Hat' 
-  if (genre === 'Tribal') driver = 'Shaker' 
-  if (genre === 'Techno') driver = (Math.random() > 0.4) ? 'Hi-Hat' : 'Ride'
-  if (genre === 'Amen Brother') driver = (Math.random() > 0.5) ? 'Ride' : 'Hi-Hat' 
-  if (genre === 'Synthwave') driver = (Math.random() > 0.7) ? 'Ride' : 'Hi-Hat' // Mostly Hats
+  if (genre === 'Trap' || genre === 'Drill') driver = 'CH'
+  if (genre === 'Tribal') driver = 'SH'
+  if (genre === 'Techno') driver = (Math.random() > 0.4) ? 'CH' : 'CY'
+  if (genre === 'Amen Brother') driver = 'CY' // Default to Ride for the classic sound
+  if (genre === 'Synthwave') driver = (Math.random() > 0.7) ? 'CY' : 'CH' // Mostly Hats
 
   active.push(driver)
 
   // 3. Secondary Driver
   if (Math.random() > 0.4) {
-      let supportDriver = drivers[Math.floor(Math.random() * drivers.length)]
-      if (supportDriver !== driver) {
-          if (genre !== 'Trap' && genre !== 'Drill') {
-             active.push(supportDriver)
-          }
+    let supportDriver = drivers[Math.floor(Math.random() * drivers.length)]
+    if (supportDriver !== driver) {
+      if (genre !== 'Trap' && genre !== 'Drill') {
+        active.push(supportDriver)
       }
+    }
   }
 
   // 4. Primary Texture
-  const textures = ['Tom', 'Percussion', 'Bell']
+  const textures = ['LT', 'RS', 'CB']
   let texture = textures[Math.floor(Math.random() * textures.length)]
-  
+
   // 5. Secondary Texture
   let secondTexture = null
   if (Math.random() > 0.6) {
-      secondTexture = textures[Math.floor(Math.random() * textures.length)]
-      if (secondTexture === texture) secondTexture = null
+    secondTexture = textures[Math.floor(Math.random() * textures.length)]
+    if (secondTexture === texture) secondTexture = null
   }
 
   if (genre === 'Ambient') {
-    active = ['Shaker', 'Ride', 'Bell', 'Tom']
-    if (Math.random() > 0.5) active.push('Percussion')
-  } 
+    active = ['SH', 'CY', 'CB', 'LT']
+    if (Math.random() > 0.5) active.push('RS')
+  }
   else if (genre === 'Tribal') {
-    active = ['Kick', 'Tom', 'Percussion', 'Shaker']
-    if (Math.random() > 0.5) active.push('Hi-Hat')
+    active = ['BD', 'LT', 'RS', 'SH']
+    if (Math.random() > 0.5) active.push('CH')
   }
   else if (genre === 'Amen Brother') {
-    active = ['Kick', 'Snare', 'Ride', 'Hi-Hat'] 
-    if (Math.random() > 0.6) active.push('Bell') 
+    // Crucial fix: Don't play both Ride and Hi-Hat to avoid "too much timbre"
+    // Use the crash/ride as the main driver, maybe add a ghosty snare or shuffle hat later, but not as a full layer
+    active = ['BD', 'SN', 'CY']
+
+    // Very rarely add a separate "shaker" layer for texture, but usually just the break trio is best
+    if (Math.random() > 0.8) active.push('SH')
   }
   else if (genre === 'Synthwave') {
-    // 80s Vibe: Kick, Snare, Hats + heavy use of Toms/Ride/Crash
-    active = ['Kick', 'Snare', 'Hi-Hat']
-    if (Math.random() > 0.3) active.push('Tom')
-    if (Math.random() > 0.5) active.push('Ride')
+    // French Touch: Kick, Snare, Hats + Shaker/Ride. 
+    // Less toms, more groove.
+    active = ['BD', 'SN', 'CH']
+    if (Math.random() > 0.4) active.push('SH') // Shaker is key for disco
+    if (Math.random() > 0.6) active.push('CY')
+    if (Math.random() > 0.8) active.push('CB') // Occasional cowbell
   }
   else {
     active.push(texture)
@@ -319,11 +460,11 @@ function generateAndWrite() {
   // Strip BPM info for internal logic mapping (e.g. "Trap (140)" -> "Trap")
   const rawGenre = sectionSetting.get()
   const genre = rawGenre.split(' (')[0]
-  
+
   const instSelection = instrumentSetting.get()
 
   let instrumentsToProcess = []
-  
+
   if (instSelection === 'All') {
     instrumentsToProcess = selectEnsemble(genre)
     println(`Generated Ensemble for ${genre}: ${instrumentsToProcess.join(', ')}`)
@@ -341,111 +482,144 @@ function generateAndWrite() {
 
   const clipChoice = (clipTypeSetting && clipTypeSetting.get && clipTypeSetting.get() === 'Arranger') ? cursorClipArranger : cursorClipLauncher
   writeEventsToClip(clipChoice, combinedEvents)
-  
-  host.showPopupNotification('Generated: ' + (isAll ? 'Ensemble' : instSelection) + ' (' + genre + ') Shift: ' + globalPitchOffset)
+
+  host.showPopupNotification('Generated: ' + (isAll ? 'Ensemble' : instSelection) + ' (' + genre + ')')
 }
 
-function generateBaseSteps(inst, genre, rule, templates, baseNote) {
-  const templateIdx = Math.floor(Math.random() * templates.length)
-  const patternStr = templates[templateIdx]
+function generateBaseSteps(inst, genre, rule, patternStr, baseNote) {
   const steps = []
 
   for (let i = 0; i < 16; i++) {
-     const char = patternStr[i]
-     if (char === '-') continue
-     if (char === '.') continue 
+    const char = patternStr[i]
+    if (char === '-') continue
+    if (char === '.') continue
 
-     let keepNote = true
-     
-     if (keepNote) {
-        let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak 
-        let type = 'hit'
-        let note = baseNote
+    let keepNote = true
 
-        if (inst === 'Shaker') {
-           const subPos = i % 4
-           if (subPos === 0) vel = rule.velStrong
-           else if (subPos === 2) vel = rule.velStrong * 0.85
-           else vel = rule.velWeak
-        }
-        if (inst === 'Ride') {
-           vel = (vel > 100) ? 95 : vel
-        }
-        if (inst === 'Bell') {
-           vel = 115 
-           type = 'bell'
-        }
-        if (inst === 'Kick') {
-           vel = 120 
-           if (char === '.') vel = 100 
-        }
-        if (inst === 'Snare') {
-           if (i % 4 === 0 || i === 4 || i === 12) vel = 125
-           else vel = 90 
-           if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
-        }
+    if (keepNote) {
+      let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak
+      let type = 'hit'
+      let note = baseNote
 
-        if (char === 'o') {
-           if (inst === 'Hi-Hat') {
-             note = clampNote(46 + globalPitchOffset) 
-           }
-           vel = rule.velStrong + 10
-           type = 'open'
-        } else if (char === 'f') {
-           type = 'flam'
-        } else if (char === '.') {
-          vel = Math.floor(vel * 0.7)
-        }
+      if (inst === 'SH') {
+        const subPos = i % 4
+        if (subPos === 0) vel = rule.velStrong
+        else if (subPos === 2) vel = rule.velStrong * 0.85
+        else vel = rule.velWeak
+      }
+      if (inst === 'CY') {
+        vel = (vel > 100) ? 95 : vel
+      }
+      if (inst === 'CB') {
+        vel = 115
+        type = 'bell'
+      }
+      if (inst === 'BD') {
+        vel = 120
+        if (char === '.') vel = 100
+      }
+      if (inst === 'SN') {
+        if (i % 4 === 0 || i === 4 || i === 12) vel = 125
+        else vel = 90
+        if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
+      }
 
-        steps.push({ i, vel, note, type })
-     }
+      if (char === 'o') {
+        if (inst === 'CH') {
+          note = getTransposedNote(GM_DRUM_MAP['OH'], DEFAULT_TRANSPOSE)
+        }
+        vel = rule.velStrong + 10
+        type = 'open'
+      } else if (char === 'f') {
+        type = 'flam'
+      } else if (char === '.') {
+        vel = Math.floor(vel * 0.7)
+      }
+
+      steps.push({ i, vel, note, type })
+    }
   }
   return steps
 }
 
 function generatePatternForInstrument(inst, genre, isAll = false) {
   const rule = RULES[genre] || RULES['Trap']
-  const bank = TEMPLATES[inst] || TEMPLATES['Hi-Hat']
+  const bank = TEMPLATES[inst] || TEMPLATES['CH']
   const templates = bank[genre] || bank['Trap'] || bank[Object.keys(bank)[0]]
-  
-  const baseNote = clampNote((NOTES[inst] || 36) + OCTAVE_OFFSET + globalPitchOffset)
+
+  const baseNote = getTransposedNote(GM_DRUM_MAP[inst], DEFAULT_TRANSPOSE)
   let events = []
 
-  const steps = generateBaseSteps(inst, genre, rule, templates, baseNote)
-  
+  // Select Main Pattern
+  let mainPattern, turnPattern
+
+  if (genre === 'Amen Brother') {
+    // Smart Pairing for Amen:
+    // First 3 templates are "Main Grooves", Last 3 are "Fills"
+    const split = Math.floor(templates.length / 2)
+    const mainIdx = Math.floor(Math.random() * split)
+    const turnIdx = split + Math.floor(Math.random() * (templates.length - split))
+
+    mainPattern = templates[mainIdx]
+    turnPattern = templates[turnIdx]
+  } else {
+    // Standard Logic
+    const mainIdx = Math.floor(Math.random() * templates.length)
+    mainPattern = templates[mainIdx]
+
+    // Algorithmically derive B-part from A-part for coherence
+    turnPattern = createVariation(mainPattern, inst, genre)
+  }
+
   for (let bar = 0; bar < 4; bar++) {
-    const isTurnaround = (bar === 3) 
-    
-    // Synthwave loves huge tom fills on turnarounds
-    if (inst === 'Tom' && genre === 'Synthwave' && !isTurnaround) {
-        if (Math.random() > 0.2) continue // 20% chance of random tom hit outside turnaround
+    const isTurnaround = (bar === 3)
+
+    // Choose pattern for this bar
+    // Techno/House/Ambient often benefit from more repetition (A-A-A-A')
+    // Breakbeats (Amen/Trap/Drill) benefit from A-A-A-B
+    let currentPattern = mainPattern
+    if (isTurnaround) {
+      // For subtle vibes, sometimes we don't want a full pattern switch, 
+      // but for 'Amen' etc we usually do.
+      if (genre !== 'Techno' && genre !== 'Ambient' && genre !== 'House') {
+        currentPattern = turnPattern
+      }
+      // For Techno/House, we might keep mainPattern but the 'isTurnaround' flag 
+      // downstream in articulations will handle the "subtle" variation (fills/rolls)
     }
-    else if (inst === 'Tom' && genre !== 'Tribal' && !isTurnaround) {
-       continue
+
+    const steps = generateBaseSteps(inst, genre, rule, currentPattern, baseNote)
+
+    // Synthwave loves huge tom fills on turnarounds
+    if (inst === 'LT' && genre === 'Synthwave' && !isTurnaround) {
+      if (Math.random() > 0.2) continue
+    }
+    else if (inst === 'LT' && genre !== 'Tribal' && !isTurnaround) {
+      continue
     }
 
     for (let s = 0; s < steps.length; s++) {
-        const step = steps[s]
-        const tick = (bar * BAR_TICKS) + (step.i * TICKS_16TH)
-        
-        events.push({
-            time: tick,
-            duration: TICKS_16TH, 
-            velocity: step.vel,
-            note: step.note,
-            type: step.type,
-            gridPos: step.i,
-            instrument: inst,
-            genre: genre
-        })
+      const step = steps[s]
+      const tick = (bar * BAR_TICKS) + (step.i * TICKS_16TH)
+
+      events.push({
+        time: tick,
+        duration: TICKS_16TH,
+        velocity: step.vel,
+        note: step.note,
+        type: step.type,
+        gridPos: step.i,
+        instrument: inst,
+        genre: genre
+      })
     }
   }
-  
+
   if (!isAll) {
     events = applyInstrumentArticulations(events, inst, rule, genre)
   }
-  events = applyGroove(events, rule) 
-  
+  events = applyGroove(events, rule)
+
   return events
 }
 
@@ -461,94 +635,115 @@ function applyInstrumentArticulations(events, inst, rule, genre) {
 
     // 1. Explicit Flams
     if (ev.type === 'flam') {
-        out.push({
-            time: Math.max(0, ev.time - 3), 
-            duration: 3, 
-            velocity: ev.velocity * 0.6,
-            note: clampNote(ev.note),
-            type: 'grace',
-            instrument: ev.instrument,
-            genre: ev.genre
-        })
-        out.push(ev)
-        processed = true
+      out.push({
+        time: Math.max(0, ev.time - 3),
+        duration: 3,
+        velocity: ev.velocity * 0.6,
+        note: clampNote(ev.note),
+        type: 'grace',
+        instrument: ev.instrument,
+        genre: ev.genre
+      })
+      out.push(ev)
+      processed = true
     }
 
     // 2. EAR CANDY: Ratchet / Rolls
-    if (!processed && (inst === 'Hi-Hat' || inst === 'Shaker' || inst === 'Ride')) {
-       let rollChance = 0.08 
-       if (genre === 'Trap' || genre === 'Drill') rollChance = 0.2
-       if (genre === 'Amen Brother') rollChance = 0.15 
-       if (isTurnaround) rollChance += 0.15
-       if (genre === 'Synthwave') rollChance = 0.02 // Synthwave usually has straight hats
-       
-       if (ev.velocity > 60 && Math.random() < rollChance) {
-          const div = (Math.random() > 0.6) ? 2 : 3 
-          const stepSize = ev.duration / div
-          
-          for (let k = 0; k < div; k++) {
-             out.push({
-                time: ev.time + (k * stepSize),
-                duration: stepSize,
-                velocity: ev.velocity * (0.7 + (k * 0.1)), 
-                note: ev.note,
-                type: 'roll',
-                instrument: ev.instrument,
-                genre: ev.genre
-             })
+    if (!processed && (inst === 'CH' || inst === 'SH' || inst === 'CY')) {
+      let rollChance = 0.08
+      if (genre === 'Trap' || genre === 'Drill') rollChance = 0.2
+      if (genre === 'Amen Brother') rollChance = 0.12
+      if (isTurnaround) rollChance += 0.15
+      if (genre === 'Synthwave') rollChance = 0.02 // Synthwave usually has straight hats
+
+      if (ev.velocity > 60 && Math.random() < rollChance) {
+        let div = (Math.random() > 0.6) ? 2 : 3
+
+        // GLITCH MODE for Trap/Drill
+        if (genre === 'Trap' || genre === 'Drill') {
+          const glitchRnd = Math.random()
+          if (glitchRnd > 0.85) div = 6      // Fast sextuplets
+          else if (glitchRnd > 0.6) div = 4  // 64th notes (machine gun)
+          else if (glitchRnd > 0.3) div = 3  // Triplets
+          else div = 2                       // 32nd notes
+        }
+
+        const stepSize = ev.duration / div
+
+        for (let k = 0; k < div; k++) {
+          let rollVel = ev.velocity * (0.7 + (k * 0.1))
+
+          if (genre === 'Trap' || genre === 'Drill') {
+            // Chaos velocity for glitch effect
+            rollVel = 40 + Math.floor(Math.random() * 80)
           }
+
+          out.push({
+            time: ev.time + (k * stepSize),
+            duration: stepSize,
+            velocity: Math.min(127, rollVel),
+            note: ev.note,
+            type: 'roll',
+            instrument: ev.instrument,
+            genre: ev.genre
+          })
+        }
+        processed = true
+      }
+      // 3. EAR CANDY: Occasional Open Hat on Off-beat
+      else if (inst === 'CH' && !processed && Math.random() < 0.04) {
+        if (ev.gridPos % 2 !== 0) {
+          out.push({
+            time: ev.time,
+            duration: TICKS_16TH * 2,
+            velocity: 110,
+            note: getTransposedNote(GM_DRUM_MAP['OH'], DEFAULT_TRANSPOSE),
+            type: 'open',
+            instrument: ev.instrument,
+            genre: ev.genre
+          })
           processed = true
-       }
-       // 3. EAR CANDY: Occasional Open Hat on Off-beat
-       else if (inst === 'Hi-Hat' && !processed && Math.random() < 0.04) {
-          if (ev.gridPos % 2 !== 0) {
-              out.push({
-                  time: ev.time,
-                  duration: TICKS_16TH * 2, 
-                  velocity: 110,
-                  note: clampNote(46 + globalPitchOffset),
-                  type: 'open',
-                  instrument: ev.instrument,
-                  genre: ev.genre
-              })
-              processed = true
-          }
-       }
+        }
+      }
     }
 
     // 4. EAR CANDY: Ghost Snares
-    if (!processed && inst === 'Snare' && ev.velocity > 100) {
-       const ghostTime = ev.time - TICKS_16TH
-       const prevEv = out.length > 0 ? out[out.length - 1] : null
-       let canAdd = true
-       if (ghostTime < 0) canAdd = false
-       if (prevEv && prevEv.time >= ghostTime) canAdd = false
+    if (!processed && inst === 'SN' && ev.velocity > 100) {
+      const ghostTime = ev.time - TICKS_16TH
+      const prevEv = out.length > 0 ? out[out.length - 1] : null
+      let canAdd = true
+      if (ghostTime < 0) canAdd = false
+      if (prevEv && prevEv.time >= ghostTime) canAdd = false
 
-       let ghostChance = 0.2
-       if (genre === 'Amen Brother') ghostChance = 0.45 
-       if (genre === 'Synthwave') ghostChance = 0.05 // Synthwave snares are usually clean
+      let ghostChance = 0.2
+      if (genre === 'Amen Brother') ghostChance = 0.65
+      if (genre === 'Lofi') ghostChance = 0.55 // More ghosts for jazz feel
 
-       if (canAdd && Math.random() < ghostChance) {
-          out.push({
-             time: ghostTime,
-             duration: TICKS_16TH,
-             velocity: 45, 
-             note: clampNote(ev.note),
-             type: 'ghost',
-             instrument: ev.instrument,
-             genre: ev.genre
-          })
-       }
+      if (canAdd && Math.random() < ghostChance) {
+        let ghostVel = 45
+        if (genre === 'Amen Brother') ghostVel = 35 + Math.random() * 20
+        if (genre === 'Lofi') ghostVel = 10 + Math.random() * 15 // Extremely quiet ghost notes
+
+        out.push({
+          time: ghostTime,
+          duration: TICKS_16TH,
+          velocity: ghostVel,
+          note: clampNote(ev.note),
+          type: 'ghost',
+          instrument: ev.instrument,
+          genre: ev.genre
+        })
+      }
     }
 
     // 5. EAR CANDY: Syncopated Accent
     if (!processed && ev.velocity < 80 && Math.random() < 0.03) {
-        ev.velocity = Math.min(127, ev.velocity + 35)
+      ev.velocity = Math.min(127, ev.velocity + 35)
     }
 
     if (!processed) out.push(ev)
   }
-  
+
   return out.sort((a, b) => a.time - b.time)
 }
 
@@ -556,13 +751,28 @@ function applyGroove(events, rule) {
   return events.map(ev => {
     const isOffbeat = (Math.floor(ev.time / TICKS_16TH) % 2 !== 0)
     if (isOffbeat) {
-    ev.time += (rule.swing * TICKS_16TH) 
+      ev.time += (rule.swing * TICKS_16TH)
     }
-    
+
+    // HUMANIZATION (Jitter)
+    // Especially for Lofi, add random timing drift
+    if (ev.genre === 'Lofi') {
+      const jitter = (Math.random() - 0.5) * 6 // +/- 3 ticks drift
+      ev.time += jitter
+    }
+
     if (ev.velocity > 127) ev.velocity = 127
     if (ev.velocity < 1) ev.velocity = 1
-    ev.note = clampNote(ev.note) 
-    
+    ev.note = clampNote(ev.note)
+
+    if (ev.genre === 'Lofi' && ev.instrument === 'SN' && (ev.velocity > 60)) {
+      // LAZY SNARE: Delay snares on 2 and 4 (gridPos 4 and 12)
+      // 4 ticks at 90bpm is ~30ms, significant drag
+      if (ev.gridPos % 8 === 4) {
+        ev.time += (TPQ * 0.05)
+      }
+    }
+
     return ev
   })
 }
@@ -583,10 +793,24 @@ function writeEventsToClip(clip, events) {
     }
   } catch (e) {
   }
+  try {
+    if (typeof clip.setStepSize === 'function') {
+      clip.setStepSize(0.0625) // 1/64th note resolution
+    } else if (clip.getStepSize && typeof clip.getStepSize().set === 'function') {
+      clip.getStepSize().set(0.0625)
+    }
+  } catch (e) {
+    // Ignore
+  }
+
+  const TICKS_64TH = 6 // 96 / 16
+
   for (let i = 0; i < events.length; i++) {
     let ev = events[i]
     if (ev.time < 0) continue
-    const step = ev.time / TICKS_16TH
+
+    // Calculate step index based on 64th note grid
+    const step = Math.round(ev.time / TICKS_64TH)
     const dur = ev.duration / TPQ
 
     const midiNote = clampNote(ev.note)
@@ -594,5 +818,5 @@ function writeEventsToClip(clip, events) {
   }
 }
 
-function flush() {}
-function exit() {}
+function flush() { }
+function exit() { }

@@ -22,16 +22,16 @@ const GM_DRUM_MAP = {
   "MT": 47,
   "HT": 50,
   "CL": 39,
-  "SH": 70,
+  "SH": 44,
   "RS": 37,
-  "CB": 56,
+  "CB": 51,
   "CY": 49,
-  "HC": 63,
+  "HC": 39,
   "AC": 57,
   "LC": 64
 }
 
-const DRUM_SECTIONS = ["Afro-Cuban","Basic Patterns","Breaks","Breaks - Kick","Breaks - Snare","Drum Rolls","Drum and Bass","Dub","EDM","Electro","Funk and Soul","Ghost Snares","Hip Hop","House","Hybrid Breaks With Alternate Endings","Irregular Breaks","Miami Bass","Pop","Reggaeton","Rock","Rolling Breaks","Standard Breaks","Uncategorized","Tribal"];
+const DRUM_SECTIONS = ["Afro-Cuban", "Basic Patterns", "Breaks", "Breaks - Kick", "Breaks - Snare", "Drum Rolls", "Drum and Bass", "Dub", "EDM", "Electro", "Funk and Soul", "Ghost Snares", "Hip Hop", "House", "Hybrid Breaks With Alternate Endings", "Irregular Breaks", "Miami Bass", "Pop", "Reggaeton", "Rock", "Rolling Breaks", "Standard Breaks", "Uncategorized", "Tribal"];
 const DRUM_SECTION_LABELS = {
   "Afro-Cuban": "Afro-Cuban (95-110 BPM)",
   "Basic Patterns": "Basic Patterns (100-120 BPM)",
@@ -2290,7 +2290,7 @@ const SECTION_RULES = {
   "Default": { velStrong: 110, velWeak: 84, swing: 0.1, ghostChance: 0.2 }
 }
 
-function patternStringToSteps (pattern) {
+function patternStringToSteps(pattern) {
   var steps = []
   var body = (pattern || "").split("")
   for (var i = 0; i < body.length && i < 16; i++) {
@@ -2304,7 +2304,7 @@ function patternStringToSteps (pattern) {
   return steps
 }
 
-function templatesToPatterns (templates) {
+function templatesToPatterns(templates) {
   var patterns = []
   for (var name in templates) {
     if (!templates.hasOwnProperty(name)) continue
@@ -2329,7 +2329,7 @@ const DRUM_PATTERNS = templatesToPatterns(DRUM_PATTERN_TEMPLATES)
 
 
 
-function init () {
+function init() {
   println('Drum Pattern ready!')
   const documentState = host.getDocumentState()
   const cursorClipLauncher = host.createLauncherCursorClip(16 * 128, 128)
@@ -2357,21 +2357,42 @@ function init () {
     writePatternToClip(clip, pattern, DEFAULT_VELOCITY, DEFAULT_TRANSPOSE)
     host.showPopupNotification('Exported "' + pattern.n + '" to ' + clipType.get())
   })
+
+  documentState.getSignalSetting('Add Ear Candies', 'Drum Pattern', 'Add Ear Candies').addSignalObserver(() => {
+    const clip = clipType.get() === 'Arranger' ? cursorClipArranger : cursorClipLauncher
+
+    // We append to the existing clip content, so we DON'T clear steps.
+    // We assume the user wants to add candies to the currently selected pattern context.
+    // However, the "pattern" variable here relies on 'patternSetting'. 
+    // If the user changed the pattern selection but didn't fire it, this might mismatch what's in the clip.
+    // But this is the expected behavior for "Evolving" the current idea based on current settings.
+
+    const pattern = findPattern(patternSetting.get())
+    if (!pattern) {
+      const msg = 'Pattern not found: ' + patternSetting.get()
+      println(msg)
+      host.showPopupNotification(msg)
+      return
+    }
+
+    addEarCandiesToClip(clip, pattern, DEFAULT_VELOCITY, DEFAULT_TRANSPOSE)
+    host.showPopupNotification('Added Ear Candies to ' + clipType.get())
+  })
 }
 
-function getPatternDisplayName (pattern) {
+function getPatternDisplayName(pattern) {
   var sectionIndex = typeof pattern.s === 'number' ? pattern.s : Number.MAX_SAFE_INTEGER
   var baseName = DRUM_SECTIONS[sectionIndex] || 'Uncategorized'
   var label = DRUM_SECTION_LABELS[baseName] || baseName
   return label + ' - ' + pattern.n
 }
 
-function getRuleForSection (sectionIndex) {
+function getRuleForSection(sectionIndex) {
   var name = DRUM_SECTIONS[sectionIndex] || 'Uncategorized'
   return SECTION_RULES[name] || SECTION_RULES['Default']
 }
 
-function getPatternNames () {
+function getPatternNames() {
   return DRUM_PATTERNS.slice().sort(function (a, b) {
     var sectionA = typeof a.s === 'number' ? a.s : Number.MAX_SAFE_INTEGER
     var sectionB = typeof b.s === 'number' ? b.s : Number.MAX_SAFE_INTEGER
@@ -2382,7 +2403,7 @@ function getPatternNames () {
   }).map(getPatternDisplayName)
 }
 
-function findPattern (name) {
+function findPattern(name) {
   for (var i = 0; i < DRUM_PATTERNS.length; i++) {
     var p = DRUM_PATTERNS[i]
     if (p.n === name || getPatternDisplayName(p) === name) {
@@ -2410,7 +2431,7 @@ function clampVelocity(v) {
   return v
 }
 
-function writePatternToClip (cursorClip, pattern, velocity, transpose) {
+function writePatternToClip(cursorClip, pattern, velocity, transpose) {
   var instruments = pattern.i || {}
   var rule = getRuleForSection(pattern.s)
   var velocityScale = velocity / DEFAULT_VELOCITY
@@ -2471,21 +2492,6 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
           note: midiNote,
           vel: finalVel
         })
-
-        // Probabilistic Ghost snares (kept for extra variation, only on strong hits that ARE NOT already ghosts)
-        if (code === 'SN' && isStrong && !isGhostNote) {
-          var ghostChance = rule.ghostChance || SECTION_RULES['Default'].ghostChance
-          if (Math.random() < ghostChance) {
-            var ghostTime = eventTime - 1
-            if (ghostTime >= 0) {
-              events.push({
-                t: ghostTime,
-                note: midiNote,
-                vel: clampVelocity(Math.round((rule.velWeak * 0.6) * velocityScale))
-              })
-            }
-          }
-        }
       }
     }
   }
@@ -2516,7 +2522,74 @@ function writePatternToClip (cursorClip, pattern, velocity, transpose) {
   }
 }
 
-function flush () {}
-function exit () {
+function addEarCandiesToClip(cursorClip, pattern, velocity, transpose) {
+  var instruments = pattern.i || {}
+  var rule = getRuleForSection(pattern.s)
+  var velocityScale = velocity / DEFAULT_VELOCITY
+  var events = []
+
+  for (var code in instruments) {
+    if (!instruments.hasOwnProperty(code)) continue
+
+    // We only want to add candies to Snares for now, as per original logic
+    if (code !== 'SN') continue
+
+    var midiNote = GM_DRUM_MAP[code]
+    if (midiNote === undefined) continue
+    midiNote = midiNote + transpose
+
+    // Normalize into 0..127 range and clamp
+    while (midiNote < 0) midiNote += 12
+    while (midiNote > 127) midiNote -= 12
+    midiNote = clampNote(Math.round(midiNote))
+
+    var steps = instruments[code]
+    for (var i = 0; i < steps.length; i++) {
+      var stepData = steps[i]
+      var stepNumber = stepData.step
+      var isGhostNote = stepData.ghost
+
+      var stepIndex = Math.max(0, stepNumber - 1)
+      var isStrong = (stepIndex % 4 === 0) || (code === 'SN' && (stepIndex % 8 === 4))
+
+      // Original logic condition: "only on strong hits that ARE NOT already ghosts"
+      if (isStrong && !isGhostNote) {
+        for (var bar = 0; bar < 4; bar++) {
+          var timeIn16ths = stepIndex + (bar * 16)
+          var isOffbeat = (timeIn16ths % 2 !== 0)
+          var swingShift = isOffbeat ? rule.swing : 0
+          var eventTime = timeIn16ths + swingShift
+
+          var ghostChance = rule.ghostChance || SECTION_RULES['Default'].ghostChance
+          // Add probabilistic ghost snare
+          if (Math.random() < ghostChance) {
+            var ghostTime = eventTime - 1
+            if (ghostTime >= 0) {
+              events.push({
+                t: ghostTime,
+                note: midiNote,
+                vel: clampVelocity(Math.round((rule.velWeak * 0.6) * velocityScale))
+              })
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // distinct from writePatternToClip: we do not clear steps. We just setStep for the new events.
+  // Note: setStep overwrites if something is exactly at that position, which is fine.
+
+  // Sort isn't strictly necessary for setStep order but good for debugging/determinism
+  events.sort(function (a, b) { return a.t - b.t })
+
+  for (var ev = 0; ev < events.length; ev++) {
+    var evt = events[ev]
+    cursorClip.setStep(0, parseInt(evt.t, 10), evt.note, evt.vel, STEP_LENGTH_BEATS)
+  }
+}
+
+function flush() { }
+function exit() {
   println('-- Drum Pattern Bye! --')
 }
