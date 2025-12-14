@@ -20,7 +20,7 @@ const GENRES = [
   'Boom Bap (90)',
   'Drill (140)',
   'House (120-128)',
-  'Lofi (80-90)',
+  'Lofi (70-90)',
   'Synthwave (100-120)',
   'Techno (130)',
   'Trap (140)',
@@ -89,6 +89,41 @@ function createVariation(pattern, inst, genre) {
     if (idx >= 0 && idx < 16 && chars[idx] === '.') {
       chars[idx] = char
     }
+
+  }
+
+  // --- LOFI SPECIFIC VARIATION (Subtractive/Chill) ---
+  if (genre === 'Lofi') {
+    // 1. KICK: Remove hits to create space
+    if (inst === 'BD' || inst === 'Bass') {
+      for (let i = 0; i < 16; i++) {
+        if (chars[i] === 'x' && Math.random() < 0.2) chars[i] = '.'
+      }
+      // Rare pickup at the end
+      if (Math.random() < 0.2 && chars[15] === '.') chars[15] = 'x'
+    }
+
+    // 2. SNARE: Ghost notes only, no heavy fills
+    if (inst === 'SN') {
+      // Add ghost before hit
+      for (let i = 1; i < 16; i++) {
+        if (chars[i] === 'x' && chars[i - 1] === '.' && Math.random() < 0.3) {
+          fill(i - 1, 'x') // 'x' here will be treated as ghost downstream if velocity is low or if we add a 'g' char support later, 
+          // but for now relying on the downstream ghost-snare logic which checks for low velocity or specific genre rules.
+          // Actually, let's rely on the downstream articulations. The 'x' just places a note.
+        }
+      }
+      // DO NOT add the heavy end fill (14, 15)
+    }
+
+    // 3. HATS/perc: Thin out
+    if (['CH', 'SH', 'CY', 'LT', 'RS', 'CB'].indexOf(inst) >= 0) {
+      for (let i = 0; i < 16; i++) {
+        if (chars[i] !== '.' && Math.random() < 0.15) chars[i] = '.'
+      }
+    }
+
+    return chars.join('')
   }
 
   // 1. DENSITY VARIATION (CH, SH, CY, LT, etc)
@@ -143,11 +178,10 @@ const TEMPLATES = {
     'Trap': ['x.........x.....', 'x...........x...', 'x..x......x.....', 'x.........x..x..', 'x.......x.x.....'],
     'Drill': ['x.........x...x.', 'x...x.....x...x.', 'x.........x.x...', 'x.....x...x.....', 'x...x...x...x...'],
     'Lofi': [
-      'x.........x..x..', // Classic
-      'x.............x.', // Super lazy
-      'x...x..x..x.....', // Dilla kick
-      'x.........x.....', // Sparse
-      'x.......x..x....'  // Off-kilter
+      'x.........x.....', // Extreme minimalism (The pulse)
+      'x.............x.', // The "breathing" kick
+      'x...x...........', // Just the start
+      'x.........x..x..'  // Classic
     ],
     'Boom Bap': ['x.........xx....', 'x..x......x.....', 'x.........x.x...', 'x.....x.x.......'],
     'House': ['x...x...x...x...', 'x...x...x...x...', 'x..x.x..x..x.x..', 'x.......x...x...'],
@@ -339,14 +373,14 @@ const TEMPLATES = {
 const RULES = {
   'Trap': { velStrong: 110, velWeak: 70, swing: 0 },
   'Drill': { velStrong: 100, velWeak: 60, swing: 0 },
-  'Lofi': { velStrong: 85, velWeak: 45, swing: 0.32 }, // Heavy swing
-  'Boom Bap': { velStrong: 95, velWeak: 60, swing: 0.15 },
-  'House': { velStrong: 100, velWeak: 50, swing: 0.05 },
-  'Techno': { velStrong: 100, velWeak: 85, swing: 0 },
+  'Lofi': { velStrong: 75, velWeak: 45, swing: 0.32 }, // Heavy swing, soft hits
+  'Boom Bap': { velStrong: 110, velWeak: 60, swing: 0.15 },
+  'House': { velStrong: 115, velWeak: 50, swing: 0.05 },
+  'Techno': { velStrong: 115, velWeak: 90, swing: 0 },
   'Ambient': { velStrong: 65, velWeak: 40, swing: 0 },
-  'Tribal': { velStrong: 115, velWeak: 75, swing: 0.18 },
-  'Amen Brother': { velStrong: 120, velWeak: 55, swing: 0.10 },
-  'Synthwave': { velStrong: 115, velWeak: 85, swing: 0.12 } // MPC Swing for French House
+  'Tribal': { velStrong: 120, velWeak: 75, swing: 0.18 },
+  'Amen Brother': { velStrong: 125, velWeak: 55, swing: 0.10 },
+  'Synthwave': { velStrong: 120, velWeak: 85, swing: 0.12 } // MPC Swing for French House
 }
 
 var sectionSetting, instrumentSetting
@@ -420,6 +454,13 @@ function selectEnsemble(genre) {
   if (genre === 'Ambient') {
     active = ['SH', 'CY', 'CB', 'LT']
     if (Math.random() > 0.5) active.push('RS')
+  }
+  else if (genre === 'Lofi') {
+    // STRICT LOFI TRIO: Kick, Snare, Hat (or Shaker)
+    // No textures, no extra clutter. Minimalist.
+    active = ['BD', 'SN']
+    // 50/50 between Closed Hat (Classic) and Shaker (Organic)
+    active.push((Math.random() > 0.5) ? 'CH' : 'SH')
   }
   else if (genre === 'Tribal') {
     active = ['BD', 'LT', 'RS', 'SH']
@@ -511,16 +552,16 @@ function generateBaseSteps(inst, genre, rule, patternStr, baseNote) {
         vel = (vel > 100) ? 95 : vel
       }
       if (inst === 'CB') {
-        vel = 115
+        vel = rule.velStrong * 1.05
         type = 'bell'
       }
       if (inst === 'BD') {
-        vel = 120
-        if (char === '.') vel = 100
+        vel = rule.velStrong + 10 // Dynamic kick, relative to genre strength
+        if (char === '.') vel = rule.velStrong - 10
       }
       if (inst === 'SN') {
-        if (i % 4 === 0 || i === 4 || i === 12) vel = 125
-        else vel = 90
+        if (i % 4 === 0 || i === 4 || i === 12) vel = rule.velStrong + 15
+        else vel = rule.velWeak + 20
         if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
       }
 
@@ -696,7 +737,7 @@ function applyInstrumentArticulations(events, inst, rule, genre) {
           out.push({
             time: ev.time,
             duration: TICKS_16TH * 2,
-            velocity: 110,
+            velocity: rule.velStrong + 10,
             note: getTransposedNote(GM_DRUM_MAP['OH'], DEFAULT_TRANSPOSE),
             type: 'open',
             instrument: ev.instrument,
