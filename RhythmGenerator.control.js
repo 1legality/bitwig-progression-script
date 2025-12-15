@@ -31,7 +31,6 @@ const INSTRUMENTS = (() => {
   return ['All'].concat(rest)
 })()
 
-const DEFAULT_VELOCITY = 110
 const DEFAULT_TRANSPOSE = -18 // Fixed: 0 shift to keep BD at C1 (36). -30 was dropping it to F#-2.
 
 const GM_DRUM_MAP = {
@@ -43,8 +42,8 @@ const GM_DRUM_MAP = {
   "MT": 47,
   "HT": 50,
   "CL": 39,
-  "SH": 44,
-  "RS": 37,
+  "SH": 49,
+  "RS": 39,
   "CB": 51,
   "CY": 49,
   "HC": 39,
@@ -335,7 +334,12 @@ const TEMPLATES = {
   'RS': {
     'Trap': ['..x...x...x...x.', '....x.......x...', 'x.......x.......', '......x...x.....'],
     'Drill': ['..x.....x.......', '......x...x.....', '....x.......x...', 'x.....x.....x...'],
-    'Lofi': ['....x.......x...', '..x...x...x.....', '........x.......', 'x.x.............'],
+    'Lofi': [
+      '....x.......x...', // Backbeat on 2 and 4 (like snare replacement)
+      '....x.......x.x.', // With ghost end
+      '....x..x....x...', // Slight swing feel
+      '....x.......x...'  // Simple and clean
+    ],
     'Boom Bap': ['..x...x.......x.', '....x...x.......', '..x.............'],
     'House': ['..x...x...x...x.', '....x.......x...', 'x.....x.....x...', '...x.....x......'],
     'Techno': ['..x...x...x...x.', '....x.......x...', 'x...x...x...x...', '......x.x.x.....'],
@@ -386,12 +390,10 @@ const RULES = {
 var sectionSetting, instrumentSetting
 var cursorClipLauncher, cursorClipArranger
 var clipTypeSetting
-var transport
 
 function init() {
-  println('Rhythm Generator v0.1 (Alphanumeric Sort) Initialized')
+  println('Rhythm Generator v0.1 Initialized')
   const documentState = host.getDocumentState()
-  transport = host.createTransport()
 
   cursorClipLauncher = host.createLauncherCursorClip(16 * 128, 128)
   cursorClipArranger = host.createArrangerCursorClip(16 * 128, 128)
@@ -403,8 +405,6 @@ function init() {
   instrumentSetting = documentState.getEnumSetting('Instrument', 'Generator', INSTRUMENTS, INSTRUMENTS[0])
   sectionSetting = documentState.getEnumSetting('Genre', 'Generator', GENRES, GENRES[0])
   clipTypeSetting = documentState.getEnumSetting('Clip Type', 'Generator', ['Launcher', 'Arranger'], 'Launcher')
-
-
 
   documentState.getSignalSetting('Generate', 'Generator', 'Generate!').addSignalObserver(() => {
     generateAndWrite()
@@ -456,9 +456,11 @@ function selectEnsemble(genre) {
     if (Math.random() > 0.5) active.push('RS')
   }
   else if (genre === 'Lofi') {
-    // STRICT LOFI TRIO: Kick, Snare, Hat (or Shaker)
-    // No textures, no extra clutter. Minimalist.
-    active = ['BD', 'SN']
+    // LOFI TRIO: Kick, backbeat (Snare OR Rim Shot), Hat (or Shaker)
+    // Rim shots are common in Lofi for a softer, jazzier feel
+    active = ['BD']
+    // 50/50 between Snare (muted) and Rim Shot (clean, dry)
+    active.push((Math.random() > 0.5) ? 'SN' : 'RS')
     // 50/50 between Closed Hat (Classic) and Shaker (Organic)
     active.push((Math.random() > 0.5) ? 'CH' : 'SH')
   }
@@ -535,50 +537,52 @@ function generateBaseSteps(inst, genre, rule, patternStr, baseNote) {
     if (char === '-') continue
     if (char === '.') continue
 
-    let keepNote = true
+    let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak
+    let type = 'hit'
+    let note = baseNote
 
-    if (keepNote) {
-      let vel = (i % 4 === 0) ? rule.velStrong : rule.velWeak
-      let type = 'hit'
-      let note = baseNote
-
-      if (inst === 'SH') {
-        const subPos = i % 4
-        if (subPos === 0) vel = rule.velStrong
-        else if (subPos === 2) vel = rule.velStrong * 0.85
-        else vel = rule.velWeak
-      }
-      if (inst === 'CY') {
-        vel = (vel > 100) ? 95 : vel
-      }
-      if (inst === 'CB') {
-        vel = rule.velStrong * 1.05
-        type = 'bell'
-      }
-      if (inst === 'BD') {
-        vel = rule.velStrong + 10 // Dynamic kick, relative to genre strength
-        if (char === '.') vel = rule.velStrong - 10
-      }
-      if (inst === 'SN') {
-        if (i % 4 === 0 || i === 4 || i === 12) vel = rule.velStrong + 15
-        else vel = rule.velWeak + 20
-        if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
-      }
-
-      if (char === 'o') {
-        if (inst === 'CH') {
-          note = getTransposedNote(GM_DRUM_MAP['OH'], DEFAULT_TRANSPOSE)
-        }
-        vel = rule.velStrong + 10
-        type = 'open'
-      } else if (char === 'f') {
-        type = 'flam'
-      } else if (char === '.') {
-        vel = Math.floor(vel * 0.7)
-      }
-
-      steps.push({ i, vel, note, type })
+    if (inst === 'SH') {
+      const subPos = i % 4
+      if (subPos === 0) vel = rule.velStrong
+      else if (subPos === 2) vel = rule.velStrong * 0.85
+      else vel = rule.velWeak
     }
+    if (inst === 'CY') {
+      vel = (vel > 100) ? 95 : vel
+    }
+    if (inst === 'CB') {
+      vel = rule.velStrong * 1.05
+      type = 'bell'
+    }
+    if (inst === 'BD') {
+      vel = rule.velStrong + 10 // Dynamic kick, relative to genre strength
+      if (char === '.') vel = rule.velStrong - 10
+    }
+    if (inst === 'SN') {
+      if (genre === 'Lofi') {
+        // Lofi snares are very muted and soft
+        vel = rule.velWeak + 10 // Much softer than other genres
+      } else if (i % 4 === 0 || i === 4 || i === 12) {
+        vel = rule.velStrong + 15
+      } else {
+        vel = rule.velWeak + 20
+      }
+      if ((genre === 'Trap' || genre === 'Drill') && i === 8) vel = 127
+    }
+
+    if (char === 'o') {
+      if (inst === 'CH') {
+        note = getTransposedNote(GM_DRUM_MAP['OH'], DEFAULT_TRANSPOSE)
+      }
+      vel = rule.velStrong + 10
+      type = 'open'
+    } else if (char === 'f') {
+      type = 'flam'
+    } else if (char === '.') {
+      vel = Math.floor(vel * 0.7)
+    }
+
+    steps.push({ i, vel, note, type })
   }
   return steps
 }
@@ -800,6 +804,7 @@ function applyGroove(events, rule) {
     if (ev.genre === 'Lofi') {
       const jitter = (Math.random() - 0.5) * 6 // +/- 3 ticks drift
       ev.time += jitter
+      if (ev.time < 0) ev.time = 0
     }
 
     if (ev.velocity > 127) ev.velocity = 127
@@ -855,7 +860,7 @@ function writeEventsToClip(clip, events) {
     const dur = ev.duration / TPQ
 
     const midiNote = clampNote(ev.note)
-    clip.setStep(0, parseInt(step, 10), midiNote, ev.velocity, dur)
+    clip.setStep(0, step, midiNote, ev.velocity, dur)
   }
 }
 
