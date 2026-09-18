@@ -1,5 +1,15 @@
 # Text to Midi
 
+> [!IMPORTANT]
+> **These Bitwig controller scripts are no longer maintained.**
+>
+> For actively maintained alternatives, use:
+>
+> * [Isorek Prologue](https://isorek.com/prologue/) for chord progressions.
+> * [Isorek Gates](https://isorek.com/gates/) for drum patterns.
+>
+> The legacy scripts in this repository remain available as-is, but no updates or support are planned.
+
 A Bitwig Studio controller script that parses a text-based chord progression and generates MIDI.
 
 ## Features
